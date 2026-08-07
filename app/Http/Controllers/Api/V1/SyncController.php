@@ -12,6 +12,21 @@ use Illuminate\Http\Request;
 
 class SyncController extends Controller
 {
+    /**
+     * Sync offline actions
+     *
+     * @group Sync
+     *
+     * @authenticated
+     *
+     * @bodyParam actions array required Array of actions to sync.
+     * @bodyParam actions.*.idempotency_key string required Unique key per action.
+     * @bodyParam actions.*.action_type string required Type: order or reservation.
+     * @bodyParam actions.*.payload array required Action data.
+     * @bodyParam device_id string required Device identifier.
+     *
+     * @response 200 {"results":[{"idempotency_key":"abc123","status":"synced","resource_id":1}]}
+     */
     public function sync(Request $request): JsonResponse
     {
         $validated = $request->validate([

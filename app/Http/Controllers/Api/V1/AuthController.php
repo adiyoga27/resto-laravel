@@ -11,6 +11,21 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
+    /**
+     * Register new user
+     *
+     * @group Authentication
+     *
+     * @unauthenticated
+     *
+     * @bodyParam name string required User name. Example: John Doe
+     * @bodyParam email string required Email address. Example: john@example.com
+     * @bodyParam password string required Password (min 8 chars, must be confirmed). Example: password123
+     * @bodyParam password_confirmation string required Password confirmation. Example: password123
+     * @bodyParam phone string Optional phone number. Example: 08123456789
+     *
+     * @response 201 {"user":{"id":1,"name":"John Doe","email":"john@example.com","role":"customer"},"token":"1|abc123"}
+     */
     public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -36,6 +51,19 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Login
+     *
+     * @group Authentication
+     *
+     * @unauthenticated
+     *
+     * @bodyParam email string required Email. Example: john@example.com
+     * @bodyParam password string required Password. Example: password123
+     *
+     * @response 200 {"user":{"id":1,"name":"John Doe","email":"john@example.com","role":"customer"},"token":"1|abc123"}
+     * @response 401 {"message":"Email atau password salah."}
+     */
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -61,6 +89,15 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout
+     *
+     * @group Authentication
+     *
+     * @authenticated
+     *
+     * @response 200 {"message":"Berhasil logout."}
+     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

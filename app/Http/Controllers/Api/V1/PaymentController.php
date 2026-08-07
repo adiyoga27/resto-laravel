@@ -10,6 +10,20 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    /**
+     * Submit payment callback
+     *
+     * @group Payments
+     *
+     * @authenticated
+     *
+     * @bodyParam order_id integer required Order ID. Example: 1
+     * @bodyParam method string required Payment method (cash/qris/transfer/card). Example: qris
+     * @bodyParam amount numeric required Payment amount. Example: 55500
+     * @bodyParam reference string Optional payment reference.
+     *
+     * @response 201 {"id":1,"order_id":1,"method":"qris","amount":55500,"status":"paid"}
+     */
     public function callback(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -30,6 +44,17 @@ class PaymentController extends Controller
         return response()->json($payment, 201);
     }
 
+    /**
+     * Show payment detail
+     *
+     * @group Payments
+     *
+     * @authenticated
+     *
+     * @urlParam payment integer required Payment ID.
+     *
+     * @response 200 {"id":1,"order_id":1,"method":"qris","amount":55500,"status":"paid","reference":null,"order":{"id":1,"order_number":"ORD-20260101-ABC123"}}
+     */
     public function show(Payment $payment): JsonResponse
     {
         return response()->json($payment->load('order'));

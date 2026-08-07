@@ -1,0 +1,101 @@
+name: Menu
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/menu
+    metadata:
+      custom: []
+      groupName: Menu
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List all menu categories with items'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '[{"id":1,"name":"Makanan","menu_items":[{"id":1,"name":"Nasi Goreng","price":25000,"image":null,"description":"Nasi goreng spesial","is_active":true}]}]'
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/menu/{menuItem_id}'
+    metadata:
+      custom: []
+      groupName: Menu
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Show menu item detail'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      menuItem_id:
+        custom: []
+        name: menuItem_id
+        description: 'The ID of the menuItem.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      menuItem:
+        custom: []
+        name: menuItem
+        description: 'Menu item ID.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      menuItem_id: 1
+      menuItem: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":1,"name":"Nasi Goreng","price":25000,"image":null,"description":"Nasi goreng spesial","category":{"id":1,"name":"Makanan"}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
