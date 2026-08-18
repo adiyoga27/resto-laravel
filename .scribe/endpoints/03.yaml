@@ -1,18 +1,18 @@
-name: Reservations
+name: Tables
 description: ''
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/reservations
+    uri: api/v1/tables
     metadata:
       custom: []
-      groupName: Reservations
+      groupName: Tables
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'List reservations'
+      title: 'List tables'
       description: ''
       authenticated: true
       deprecated: false
@@ -21,8 +21,20 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      status:
+        custom: []
+        name: status
+        description: 'Filter by status (kosong, terisi, direservasi).'
+        required: false
+        example: kosong
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      status: kosong
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -30,7 +42,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '[{"id":1,"restaurant_table_id":1,"reservation_time":"2026-01-15 19:00:00","guest_count":4,"status":"pending","restaurant_table":{"id":1,"table_number":"T01","capacity":4}}]'
+        content: '[{"id":1,"table_number":"T01","capacity":4,"status":"kosong"}]'
         headers: []
         description: ''
     responseFields: []
@@ -42,14 +54,14 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/reservations
+    uri: api/v1/tables
     metadata:
       custom: []
-      groupName: Reservations
+      groupName: Tables
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Create reservation'
+      title: 'Create table'
       description: ''
       authenticated: true
       deprecated: false
@@ -61,32 +73,21 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      restaurant_table_id:
+      table_number:
         custom: []
-        name: restaurant_table_id
-        description: 'Table ID.'
+        name: table_number
+        description: 'Table number/name.'
         required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      reservation_time:
-        custom: []
-        name: reservation_time
-        description: 'Reservation datetime.'
-        required: true
-        example: '2026-01-15 19:00:00'
+        example: T05
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      guest_count:
+      capacity:
         custom: []
-        name: guest_count
-        description: 'Number of guests.'
+        name: capacity
+        description: 'Seat capacity (min 1).'
         required: true
         example: 4
         type: integer
@@ -94,28 +95,15 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      notes:
-        custom: []
-        name: notes
-        description: 'Optional notes.'
-        required: false
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
     cleanBodyParameters:
-      restaurant_table_id: 1
-      reservation_time: '2026-01-15 19:00:00'
-      guest_count: 4
-      notes: architecto
+      table_number: T05
+      capacity: 4
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"id":1,"restaurant_table_id":1,"reservation_time":"2026-01-15 19:00:00","guest_count":4,"status":"pending","restaurant_table":{"id":1,"table_number":"T01"}}'
+        content: '{"id":5,"table_number":"T05","capacity":4,"status":"kosong"}'
         headers: []
         description: ''
     responseFields: []
@@ -127,14 +115,14 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/reservations/{reservation_id}'
+    uri: 'api/v1/tables/{table_id}'
     metadata:
       custom: []
-      groupName: Reservations
+      groupName: Tables
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Show reservation detail'
+      title: 'Show table detail'
       description: ''
       authenticated: true
       deprecated: false
@@ -142,21 +130,21 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      reservation_id:
+      table_id:
         custom: []
-        name: reservation_id
-        description: 'The ID of the reservation.'
+        name: table_id
+        description: 'The ID of the table.'
         required: true
-        example: 16
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      reservation:
+      table:
         custom: []
-        name: reservation
-        description: 'Reservation ID.'
+        name: table
+        description: 'Table ID.'
         required: true
         example: 16
         type: integer
@@ -165,8 +153,8 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      reservation_id: 16
-      reservation: 16
+      table_id: 1
+      table: 16
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -176,7 +164,165 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":1,"restaurant_table_id":1,"reservation_time":"2026-01-15 19:00:00","guest_count":4,"status":"pending","restaurant_table":{"id":1,"table_number":"T01","capacity":4}}'
+        content: '{"id":1,"table_number":"T01","capacity":4,"status":"kosong"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/v1/tables/{table_id}'
+    metadata:
+      custom: []
+      groupName: Tables
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update table'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      table_id:
+        custom: []
+        name: table_id
+        description: 'The ID of the table.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      table:
+        custom: []
+        name: table
+        description: 'Table ID.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      table_id: 1
+      table: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      table_number:
+        custom: []
+        name: table_number
+        description: 'Table number/name.'
+        required: false
+        example: T05
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      capacity:
+        custom: []
+        name: capacity
+        description: 'Seat capacity (min 1).'
+        required: false
+        example: 6
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: 'Table status (kosong, terisi, direservasi).'
+        required: false
+        example: terisi
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      table_number: T05
+      capacity: 6
+      status: terisi
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":1,"table_number":"T05","capacity":6,"status":"terisi"}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/tables/{table_id}'
+    metadata:
+      custom: []
+      groupName: Tables
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete table'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      table_id:
+        custom: []
+        name: table_id
+        description: 'The ID of the table.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      table:
+        custom: []
+        name: table
+        description: 'Table ID.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      table_id: 1
+      table: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"message":"Table deleted successfully."}'
         headers: []
         description: ''
     responseFields: []

@@ -17,7 +17,8 @@ class Order extends Model
 
     protected $fillable = [
         'order_number', 'customer_id', 'restaurant_table_id', 'created_by',
-        'channel', 'order_type', 'order_status', 'subtotal', 'discount', 'tax', 'total',
+        'channel', 'order_type', 'order_status', 'is_posted_to_cash_flow',
+        'subtotal', 'discount', 'tax', 'total',
         'notes', 'delivery_address', 'customer_name', 'customer_phone',
     ];
 
@@ -27,6 +28,7 @@ class Order extends Model
             'channel' => OrderChannel::class,
             'order_type' => OrderType::class,
             'order_status' => OrderStatus::class,
+            'is_posted_to_cash_flow' => 'boolean',
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'tax' => 'decimal:2',
@@ -84,5 +86,38 @@ class Order extends Model
         $this->tax = $this->subtotal * 0.11;
         $this->total = $this->subtotal + $this->tax;
         $this->save();
+    }
+
+    public function mutateStock(): void
+    {
+        $this->load('orderItems.menuItem.recipeItems.ingredient');
+
+        foreach ($this->orderItems as $item) {
+            $menuItem = $item->menuItem;
+            if (! $menuItem) {
+                continue;
+            }
+
+            foreach ($menuItem->recipeItems as $recipe) {
+                $ingredient = $recipe->ingredient;
+                $totalUsed = $recipe->quantity * $item->quantity;
+                $stockBefore = $ingredient->current_stock;
+                $stockAfter = $stockBefore - $totalUsed;
+
+                StockLog::create([
+                    'ingredient_id' => $ingredient->id,
+                    'menu_item_id' => $menuItem->id,
+                    'type' => 'out',
+                    'quantity' => $totalUsed,
+                    'stock_before' => $stockBefore,
+                    'stock_after' => $stockAfter,
+                    'reference' => 'Order #'.$this->order_number,
+                    'notes' => 'Penjualan: '.$menuItem->name.' x'.$item->quantity,
+                    'user_id' => auth()->id() ?? $this->created_by ?? 1,
+                ]);
+
+                $ingredient->update(['current_stock' => $stockAfter]);
+            }
+        }
     }
 }

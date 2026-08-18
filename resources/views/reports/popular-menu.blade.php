@@ -10,7 +10,8 @@
             <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="form-control form-control-sm mr-2">
             <label class="mr-2 small text-muted">Sampai</label>
             <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-control form-control-sm mr-2">
-            <button class="btn btn-primary btn-sm"><i class="fas fa-filter mr-1"></i>Filter</button>
+            <button class="btn btn-primary btn-sm mr-2"><i class="fas fa-filter mr-1"></i>Filter</button>
+            <a href="{{ route('reports.popular-menu.export', request()->only(['start_date', 'end_date'])) }}" class="btn btn-success btn-sm"><i class="fas fa-file-excel mr-1"></i>Export Excel</a>
         </form>
     </div>
 </div>

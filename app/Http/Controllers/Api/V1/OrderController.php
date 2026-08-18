@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\OrderChannel;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Enums\TableStatus;
 use App\Http\Controllers\Controller;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\RestaurantTable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -40,13 +42,14 @@ class OrderController extends Controller
      *
      * @authenticated
      *
-     * @bodyParam order_type string required Order type (delivery/pickup). Example: delivery
+     * @bodyParam order_type string required Order type (dine-in/delivery/pickup). Example: delivery
+     * @bodyParam restaurant_table_id integer required if order_type=dine-in Table ID. Example: 1
      * @bodyParam items array required Array of order items.
      * @bodyParam items.*.menu_item_id integer required Menu item ID. Example: 1
      * @bodyParam items.*.quantity integer required Quantity. Example: 2
      * @bodyParam items.*.notes string Optional notes for this item.
      * @bodyParam customer_name string required Customer name. Example: John Doe
-     * @bodyParam customer_phone string required Customer phone number. Example: 08123456789
+     * @bodyParam customer_phone string Optional customer phone number. Example: 08123456789
      * @bodyParam delivery_address string required if order_type=delivery. Example: Jl. Merdeka No. 10
      * @bodyParam discount numeric Discount amount. Example: 5000
      * @bodyParam notes string Optional order notes.
@@ -56,7 +59,8 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'order_type' => ['required', 'string', 'in:delivery,pickup'],
+            'order_type' => ['required', 'string', 'in:dine-in,delivery,pickup'],
+            'restaurant_table_id' => ['nullable', 'required_if:order_type,dine-in', 'exists:restaurant_tables,id'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_item_id' => ['required', 'exists:menu_items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
@@ -64,14 +68,22 @@ class OrderController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'delivery_address' => ['required_if:order_type,delivery', 'string', 'max:500'],
             'customer_name' => ['required', 'string', 'max:255'],
-            'customer_phone' => ['required', 'string', 'max:20'],
+            'customer_phone' => ['nullable', 'string', 'max:20'],
             'discount' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        if ($validated['order_type'] === 'dine-in') {
+            $table = RestaurantTable::findOrFail($validated['restaurant_table_id']);
+            if ($table->status === TableStatus::Kosong) {
+                $table->update(['status' => TableStatus::Terisi]);
+            }
+        }
 
         $discount = (float) ($validated['discount'] ?? 0);
 
         $order = Order::create([
             'customer_id' => auth()->id(),
+            'restaurant_table_id' => $validated['restaurant_table_id'] ?? null,
             'channel' => OrderChannel::Mobile,
             'order_type' => OrderType::from($validated['order_type']),
             'order_status' => OrderStatus::Baru,
@@ -82,7 +94,7 @@ class OrderController extends Controller
             'notes' => $validated['notes'] ?? null,
             'delivery_address' => $validated['delivery_address'] ?? null,
             'customer_name' => $validated['customer_name'],
-            'customer_phone' => $validated['customer_phone'],
+            'customer_phone' => $validated['customer_phone'] ?? null,
         ]);
 
         $subtotal = 0;
@@ -134,5 +146,40 @@ class OrderController extends Controller
         }
 
         return response()->json($order->load(['orderItems.menuItem', 'payments', 'restaurantTable']));
+    }
+
+    /**
+     * Update order status (progress transaction)
+     *
+     * @group Orders
+     *
+     * @authenticated
+     *
+     * @urlParam order integer required Order ID.
+     *
+     * @bodyParam status string required New status (baru/diproses/siap/selesai/dibatalkan). Example: diproses
+     *
+     * @response 200 {"id":1,"order_number":"ORD-20260101-ABC123","order_status":"diproses","order_items":[],"restaurant_table":{"id":1,"table_number":"T01","capacity":4,"status":"terisi"}}
+     */
+    public function updateStatus(Request $request, Order $order): JsonResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:baru,diproses,siap,selesai,dibatalkan'],
+        ]);
+
+        $order->update(['order_status' => OrderStatus::from($validated['status'])]);
+
+        if (in_array($validated['status'], ['selesai', 'dibatalkan']) && $order->restaurant_table_id) {
+            $hasActiveOrders = Order::where('restaurant_table_id', $order->restaurant_table_id)
+                ->whereIn('order_status', ['baru', 'diproses', 'siap'])
+                ->exists();
+
+            if (! $hasActiveOrders) {
+                RestaurantTable::where('id', $order->restaurant_table_id)
+                    ->update(['status' => TableStatus::Kosong]);
+            }
+        }
+
+        return response()->json($order->load(['orderItems.menuItem', 'restaurantTable']));
     }
 }

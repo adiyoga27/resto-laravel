@@ -33,6 +33,16 @@ class MenuItem extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function recipeItems(): HasMany
+    {
+        return $this->hasMany(RecipeItem::class);
+    }
+
+    public function stockLogs(): HasMany
+    {
+        return $this->hasMany(StockLog::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

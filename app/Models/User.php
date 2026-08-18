@@ -68,4 +68,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(MobileSyncLog::class);
     }
+
+    public function cashFlowsCreated(): HasMany
+    {
+        return $this->hasMany(CashFlow::class, 'created_by');
+    }
+
+    public function cashFlowsPosted(): HasMany
+    {
+        return $this->hasMany(CashFlow::class, 'posted_by');
+    }
 }

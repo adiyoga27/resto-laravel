@@ -376,13 +376,56 @@
 </style>
 @endpush
 @push('scripts')
+<script src="{{ asset('js/qz-tray.js') }}"></script>
+@endpush
+@push('scripts')
 <script>
 let cart = [], selectedTable = null, selectedOrderType = 'dine-in';
 let discount = 0, editingOrderId = null;
+const successOrderId = @json(session('success_order_id'));
+window.posPrinter = @json(config('pos.printer'));
+
+const RECEIPT_WIDTH = 48;
+const ESC = '\x1B';
+const GS = '\x1D';
 
 $(document).ready(function(){
     updateOrderTypeUI();
     renderCart();
+
+    qz.security.setCertificatePromise(function(resolve, reject) {
+        fetch('/qz/digital-certificate.txt', { cache: 'no-store' })
+            .then(function(res) { return res.ok ? res.text() : Promise.reject(res.statusText); })
+            .then(function(text) {
+                if (text.indexOf('BEGIN CERTIFICATE') === -1) {
+                    reject(new Error('Sertifikat QZ tidak valid'));
+                    return;
+                }
+                resolve(text);
+            }, reject);
+    });
+
+    qz.security.setSignatureAlgorithm('SHA512');
+    qz.security.setSignaturePromise(function(toSign) {
+        return fetch('/qz/sign', {
+            method: 'POST',
+            cache: 'no-store',
+            headers: { 'Content-Type': 'text/plain' },
+            body: toSign
+        }).then(function(res) {
+            if (!res.ok) {
+                return res.text().then(function(body) {
+                    throw new Error('POST /qz/sign gagal: HTTP ' + res.status + ' - ' + body.slice(0, 200));
+                });
+            }
+            return res.text();
+        }).then(function(text) {
+            if (!/^[A-Za-z0-9+/=\s]+$/.test(text)) {
+                throw new Error('Respons tanda tangan tidak valid: ' + text.slice(0, 200) + ' (mungkin sesi login berakhir)');
+            }
+            return text;
+        });
+    });
 
     @if(session('success_order_id'))
     $('#modalOrderNumber').text('#{{ session('success_order_number') }}');
@@ -391,6 +434,147 @@ $(document).ready(function(){
     $('#successOverlay').css('display', 'flex');
     @endif
 });
+
+function printerSettings() {
+    const defaults = window.posPrinter || {};
+    return {
+        host: localStorage.getItem('posPrinterHost') || defaults.host,
+        port: parseInt(localStorage.getItem('posPrinterPort') || defaults.port || 9100, 10)
+    };
+}
+
+function sanitizeText(str) {
+    let out = String(str || '');
+    if (out.normalize) {
+        out = out.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    return out.replace(/[^\x20-\x7E]/g, '?');
+}
+
+function money(n) {
+    return Number(n || 0).toLocaleString('id-ID');
+}
+
+function padLeft(text, width) {
+    text = String(text);
+    return (' '.repeat(Math.max(0, width - text.length)) + text).slice(-width);
+}
+
+function buildReceiptData(r) {
+    const W = RECEIPT_WIDTH;
+    const store = r.store || {};
+    const o = r.order || {};
+    const lines = [];
+    const raw = t => lines.push(t);
+    const txt = t => lines.push(sanitizeText(t));
+
+    raw(ESC + '@');
+    raw(ESC + 'a' + '\x01');
+    raw(ESC + 'E' + '\x01');
+    txt(store.name || '');
+    raw(ESC + 'E' + '\x00');
+    if (store.address) txt(store.address);
+    if (store.phone) txt(store.phone);
+    raw(ESC + 'a' + '\x00');
+    txt('-'.repeat(W));
+    txt('No       : ' + (o.number || '-'));
+    txt('Waktu    : ' + (o.date || '-'));
+    txt('Kasir    : ' + (o.cashier || '-'));
+    txt('Tipe     : ' + (o.type || '-'));
+    if (o.table) txt('Meja     : ' + o.table);
+    if (o.customer_name) txt('Pelanggan: ' + o.customer_name);
+    txt('-'.repeat(W));
+
+    (o.items || []).forEach(function(item) {
+        raw(ESC + 'E' + '\x01');
+        txt(item.name || 'Item');
+        raw(ESC + 'E' + '\x00');
+        const qtyPrice = item.qty + 'x' + money(item.price);
+        const sub = money(item.subtotal);
+        const gap = Math.max(1, W - qtyPrice.length - sub.length - 2);
+        txt('  ' + qtyPrice + ' '.repeat(gap) + sub);
+        if (item.notes) txt('   * ' + item.notes);
+    });
+
+    txt('-'.repeat(W));
+    txt('Subtotal'.padEnd(W - 12) + padLeft(money(o.subtotal), 12));
+    if (Number(o.discount) > 0) {
+        txt('Diskon'.padEnd(W - 12) + padLeft('-' + money(o.discount), 12));
+    }
+    txt('Tax (11%)'.padEnd(W - 12) + padLeft(money(o.tax), 12));
+    raw(ESC + 'E' + '\x01');
+    raw(ESC + '!' + '\x10');
+    txt('TOTAL'.padEnd(W - 12) + padLeft(money(o.total), 12));
+    raw(ESC + '!' + '\x00');
+    raw(ESC + 'E' + '\x00');
+    txt('-'.repeat(W));
+
+    (o.payments || []).forEach(function(p) {
+        txt('Bayar (' + p.method + ')' + (p.reference ? ' - ' + p.reference : ''));
+        txt('  Jumlah'.padEnd(W - 12) + padLeft(money(p.amount), 12));
+    });
+
+    if (o.notes) {
+        txt('Catatan:');
+        txt(o.notes);
+    }
+
+    raw(ESC + 'a' + '\x01');
+    txt(store.footer || 'Terima kasih');
+    raw(ESC + 'a' + '\x00');
+    txt('');
+    txt('');
+    txt('');
+    txt('');
+    raw(GS + 'V' + '\x42' + '\x01');
+
+    return lines.join('\n');
+}
+
+function printRaw(data, attempt) {
+    attempt = attempt || 1;
+    const settings = printerSettings();
+    return qz.websocket.connect({ retries: 2, delay: 1 }).then(function() {
+        const config = qz.configs.create({ host: settings.host, port: settings.port }, { encoding: 'ISO-8859-1' });
+        return qz.print(config, [data]);
+    }).catch(function(err) {
+        if (attempt < 3) {
+            return qz.websocket.disconnect().catch(function() {}).then(function() {
+                return new Promise(function(resolve) { setTimeout(resolve, 1500); });
+            }).then(function() {
+                return printRaw(data, attempt + 1);
+            });
+        }
+        throw err;
+    });
+}
+
+function showPrintError(err) {
+    console.error(err);
+    alert('Gagal mencetak. Pastikan:\n' +
+        '1. QZ Tray sudah diinstall dan berjalan di laptop ini (qz.io/download).\n' +
+        '2. Laptop terhubung ke jaringan yang sama dengan printer.\n' +
+        '3. IP printer benar (' + printerSettings().host + ':' + printerSettings().port + ').\n\nDetail: ' + err);
+}
+
+function printTestPage() {
+    const settings = printerSettings();
+    const W = RECEIPT_WIDTH;
+    const lines = [
+        ESC + '@',
+        ESC + 'a' + '\x01',
+        '=== TES PRINTER ===',
+        '80mm ESC/POS via QZ Tray',
+        ESC + 'a' + '\x00',
+        '-'.repeat(W),
+        'Host: ' + settings.host + ':' + settings.port,
+        'Jika tulisan ini tercetak,',
+        'printer siap digunakan.',
+        '',
+        GS + 'V' + '\x42' + '\x01'
+    ];
+    printRaw(lines.join('\n')).catch(showPrintError);
+}
 
 function setOrderType(type) {
     selectedOrderType = type;
@@ -542,7 +726,16 @@ function resetCart() {
 }
 
 function printOrder() {
-    window.print();
+    if (!successOrderId) { return; }
+    fetch('/pos/orders/' + successOrderId + '/receipt')
+        .then(function(res) {
+            if (!res.ok) { throw new Error('HTTP ' + res.status); }
+            return res.json();
+        })
+        .then(function(receipt) {
+            return printRaw(buildReceiptData(receipt));
+        })
+        .catch(showPrintError);
 }
 
 function closeSuccessModal() {
@@ -682,6 +875,9 @@ function closeSuccessModal() {
                     <span id="cartTitle">Pesanan Baru</span>
                 </h6>
                 <div class="d-flex align-items-center" style="gap:8px;">
+                    <button type="button" class="btn btn-sm" title="Tes Printer" style="background:#f1f5f9;color:#475569;border:none;border-radius:6px;font-weight:600;font-size:0.72rem;padding:4px 10px;" onclick="printTestPage()">
+                        <i class="fas fa-print"></i>
+                    </button>
                     <button type="button" id="resetCartBtn" class="btn btn-sm d-none" style="background:#fef2f2;color:#dc2626;border:none;border-radius:6px;font-weight:600;font-size:0.72rem;padding:4px 10px;" onclick="resetCart()">
                         <i class="fas fa-times mr-1"></i>Batal
                     </button>

@@ -94,6 +94,20 @@
                         <li class="nav-item"><a href="{{ route('admin.tables.create') }}" class="nav-link {{ request()->routeIs('admin.tables.create') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Tambah Meja</p></a></li>
                     </ul>
                 </li>
+
+                <li class="nav-header">MANAJEMEN STOK</li>
+                <li class="nav-item {{ request()->routeIs('admin.ingredients.*') || request()->routeIs('admin.recipes.*') || request()->routeIs('admin.stock-logs.*') || request()->routeIs('admin.stock-opnames.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.ingredients.*') || request()->routeIs('admin.recipes.*') || request()->routeIs('admin.stock-logs.*') || request()->routeIs('admin.stock-opnames.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-warehouse"></i>
+                        <p>Stok<i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item"><a href="{{ route('admin.ingredients.index') }}" class="nav-link {{ request()->routeIs('admin.ingredients.*') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Bahan Baku</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.recipes.index') }}" class="nav-link {{ request()->routeIs('admin.recipes.*') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Resep</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.stock-logs.index') }}" class="nav-link {{ request()->routeIs('admin.stock-logs.*') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Mutasi Stok</p></a></li>
+                        <li class="nav-item"><a href="{{ route('admin.stock-opnames.index') }}" class="nav-link {{ request()->routeIs('admin.stock-opnames.*') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Stok Opname</p></a></li>
+                    </ul>
+                </li>
                 @endif
 
                 {{-- POS & Laporan --}}
@@ -114,6 +128,7 @@
                         <li class="nav-item"><a href="{{ route('reports.sales') }}" class="nav-link {{ request()->routeIs('reports.sales') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Penjualan</p></a></li>
                         <li class="nav-item"><a href="{{ route('reports.popular-menu') }}" class="nav-link {{ request()->routeIs('reports.popular-menu') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Menu Terlaris</p></a></li>
                         <li class="nav-item"><a href="{{ route('reports.tables') }}" class="nav-link {{ request()->routeIs('reports.tables') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Meja</p></a></li>
+                        <li class="nav-item"><a href="{{ route('reports.cash-flow') }}" class="nav-link {{ request()->routeIs('reports.cash-flow*') ? 'active' : '' }}"><i class="far fa-circle nav-icon"></i><p>Arus Kas</p></a></li>
                     </ul>
                 </li>
                 @endif
@@ -209,6 +224,7 @@
     });
 </script>
 @stack('scripts')
+@stack('modals')
 @if(request()->routeIs('pos.*'))
 <script>
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }

@@ -227,11 +227,14 @@ class PosController extends Controller
 
     public function completeOrder(Order $order): RedirectResponse
     {
-        if ($order->created_by !== auth()->id()) {
+        if ($order->created_by && $order->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
             abort(403);
         }
 
-        $order->update(['order_status' => OrderStatus::Selesai]);
+        if ($order->order_status !== OrderStatus::Selesai) {
+            $order->update(['order_status' => OrderStatus::Selesai]);
+            $order->mutateStock();
+        }
 
         if ($order->restaurant_table_id) {
             $this->freeTableIfNoActiveOrders($order->restaurant_table_id);
@@ -242,7 +245,7 @@ class PosController extends Controller
 
     public function cancelOrder(Order $order): RedirectResponse
     {
-        if ($order->created_by !== auth()->id()) {
+        if ($order->created_by && $order->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
             abort(403);
         }
 
