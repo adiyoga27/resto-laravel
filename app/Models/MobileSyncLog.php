@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['user_id', 'device_id', 'idempotency_key', 'action_type', 'payload', 'status', 'error_message', 'synced_at'])]
 class MobileSyncLog extends Model
 {
     use HasFactory;
 
-    #[Fillable(['user_id', 'device_id', 'idempotency_key', 'action_type', 'payload', 'status', 'error_message', 'synced_at'])]
     protected function casts(): array
     {
         return [

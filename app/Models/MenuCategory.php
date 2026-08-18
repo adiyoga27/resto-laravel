@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['name', 'description', 'is_active', 'sort_order'])]
 class MenuCategory extends Model
 {
     use HasFactory;
 
-    #[Fillable(['name', 'description', 'is_active', 'sort_order'])]
     protected function casts(): array
     {
         return [
