@@ -9,11 +9,12 @@ use App\Models\StockLog;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class StockLogController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
@@ -23,16 +24,26 @@ class StockLogController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('admin.stock-logs.index', compact('logs', 'startDate', 'endDate'));
+        return Inertia::render('Admin/StockLogs/Index', [
+            'logs' => $logs,
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
-    public function create(Request $request): View
+    public function create(Request $request): Response
     {
         $type = $request->get('type', 'in');
         $ingredients = Ingredient::active()->orderBy('name')->get();
         $menuItems = MenuItem::with('category')->active()->orderBy('name')->get();
 
-        return view('admin.stock-logs.create', compact('ingredients', 'menuItems', 'type'));
+        return Inertia::render('Admin/StockLogs/Create', [
+            'ingredients' => $ingredients,
+            'menuItems' => $menuItems,
+            'type' => $type,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -73,11 +84,13 @@ class StockLogController extends Controller
             ->with('success', 'Mutasi stok berhasil dicatat.');
     }
 
-    public function createProduction(): View
+    public function createProduction(): Response
     {
         $menuItems = MenuItem::with(['category', 'recipeItems.ingredient'])->active()->orderBy('name')->get();
 
-        return view('admin.stock-logs.production', compact('menuItems'));
+        return Inertia::render('Admin/StockLogs/Production', [
+            'menuItems' => $menuItems,
+        ]);
     }
 
     public function storeProduction(Request $request): RedirectResponse

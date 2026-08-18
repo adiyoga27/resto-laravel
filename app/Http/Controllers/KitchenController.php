@@ -7,18 +7,21 @@ use App\Enums\TableStatus;
 use App\Models\Order;
 use App\Models\RestaurantTable;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class KitchenController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $orders = Order::with(['orderItems.menuItem', 'restaurantTable'])
             ->whereIn('order_status', ['baru', 'diproses', 'siap'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('kitchen.index', compact('orders'));
+        return Inertia::render('Kitchen/Index', [
+            'orders' => $orders,
+        ]);
     }
 
     public function getOrders(): JsonResponse

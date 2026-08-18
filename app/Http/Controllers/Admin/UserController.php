@@ -8,22 +8,30 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $users = User::orderBy('created_at', 'desc')->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        $roles = UserRole::cases();
+        $roles = collect(UserRole::cases())->map(fn ($role) => [
+            'value' => $role->value,
+            'label' => ucfirst($role->value),
+        ]);
 
-        return view('admin.users.create', compact('roles'));
+        return Inertia::render('Admin/Users/Create', [
+            'roles' => $roles,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -44,11 +52,17 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat.');
     }
 
-    public function edit(User $user): View
+    public function edit(User $user): Response
     {
-        $roles = UserRole::cases();
+        $roles = collect(UserRole::cases())->map(fn ($role) => [
+            'value' => $role->value,
+            'label' => ucfirst($role->value),
+        ]);
 
-        return view('admin.users.edit', compact('user', 'roles'));
+        return Inertia::render('Admin/Users/Edit', [
+            'user' => $user,
+            'roles' => $roles,
+        ]);
     }
 
     public function update(Request $request, User $user): RedirectResponse

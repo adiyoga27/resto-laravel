@@ -16,11 +16,12 @@ use App\Models\RestaurantTable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PosController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $menuItems = MenuItem::with('category')
             ->where('is_active', true)
@@ -31,7 +32,7 @@ class PosController extends Controller
                 return $item->category?->name ?? 'Tanpa Kategori';
             });
 
-        $tables = RestaurantTable::orderByRaw("FIELD(status, 'kosong', 'terisi', 'direservasi')")
+        $tables = RestaurantTable::orderByRaw("CASE status WHEN 'kosong' THEN 0 WHEN 'terisi' THEN 1 WHEN 'direservasi' THEN 2 ELSE 3 END")
             ->orderBy('table_number')
             ->get();
 
@@ -41,7 +42,18 @@ class PosController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('pos.index', compact('menuItems', 'tables', 'activeOrders'));
+        return Inertia::render('Pos/Index', [
+            'menuItems' => $menuItems,
+            'tables' => $tables,
+            'activeOrders' => $activeOrders,
+            'printer' => config('pos.printer'),
+            'successOrder' => session('success_order_id') ? [
+                'id' => session('success_order_id'),
+                'number' => session('success_order_number'),
+                'total' => (float) session('success_order_total'),
+                'items' => session('success_order_items'),
+            ] : null,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

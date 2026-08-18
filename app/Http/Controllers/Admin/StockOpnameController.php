@@ -9,22 +9,27 @@ use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class StockOpnameController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $opnames = StockOpname::with('user')->orderBy('date', 'desc')->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('admin.stock-opnames.index', compact('opnames'));
+        return Inertia::render('Admin/StockOpnames/Index', [
+            'opnames' => $opnames,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
         $ingredients = Ingredient::active()->orderBy('name')->get();
 
-        return view('admin.stock-opnames.create', compact('ingredients'));
+        return Inertia::render('Admin/StockOpnames/Create', [
+            'ingredients' => $ingredients,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -66,11 +71,13 @@ class StockOpnameController extends Controller
             ->with('success', 'Stok opname berhasil dibuat.');
     }
 
-    public function show(StockOpname $stockOpname): View
+    public function show(StockOpname $stockOpname): Response
     {
         $stockOpname->load(['items.ingredient', 'user']);
 
-        return view('admin.stock-opnames.show', compact('stockOpname'));
+        return Inertia::render('Admin/StockOpnames/Show', [
+            'stockOpname' => $stockOpname,
+        ]);
     }
 
     public function post(StockOpname $stockOpname): RedirectResponse

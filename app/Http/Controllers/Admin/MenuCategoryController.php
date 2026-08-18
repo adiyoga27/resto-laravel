@@ -6,20 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\MenuCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class MenuCategoryController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        $categories = MenuCategory::orderBy('sort_order')->paginate(20);
+        $categories = MenuCategory::withCount('menuItems')->orderBy('sort_order')->paginate(20);
 
-        return view('admin.menu-categories.index', compact('categories'));
+        return Inertia::render('Admin/MenuCategories/Index', [
+            'categories' => $categories,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.menu-categories.create');
+        return Inertia::render('Admin/MenuCategories/Create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,9 +39,11 @@ class MenuCategoryController extends Controller
         return redirect()->route('admin.menu-categories.index')->with('success', 'Kategori berhasil dibuat.');
     }
 
-    public function edit(MenuCategory $menuCategory): View
+    public function edit(MenuCategory $menuCategory): Response
     {
-        return view('admin.menu-categories.edit', compact('menuCategory'));
+        return Inertia::render('Admin/MenuCategories/Edit', [
+            'menuCategory' => $menuCategory,
+        ]);
     }
 
     public function update(Request $request, MenuCategory $menuCategory): RedirectResponse

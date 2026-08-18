@@ -6,20 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Ingredient;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class IngredientController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $ingredients = Ingredient::orderBy('name')->paginate(20);
 
-        return view('admin.ingredients.index', compact('ingredients'));
+        return Inertia::render('Admin/Ingredients/Index', [
+            'ingredients' => $ingredients,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.ingredients.create');
+        return Inertia::render('Admin/Ingredients/Create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -38,9 +41,11 @@ class IngredientController extends Controller
             ->with('success', 'Bahan baku berhasil ditambahkan.');
     }
 
-    public function edit(Ingredient $ingredient): View
+    public function edit(Ingredient $ingredient): Response
     {
-        return view('admin.ingredients.edit', compact('ingredient'));
+        return Inertia::render('Admin/Ingredients/Edit', [
+            'ingredient' => $ingredient,
+        ]);
     }
 
     public function update(Request $request, Ingredient $ingredient): RedirectResponse

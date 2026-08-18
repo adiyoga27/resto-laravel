@@ -12,11 +12,12 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class ReportController extends Controller
 {
-    public function sales(Request $request): View
+    public function sales(Request $request): InertiaResponse
     {
         $period = $request->get('period', 'daily');
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
@@ -28,18 +29,27 @@ class ReportController extends Controller
             $query->forKasir(auth()->id());
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->paginate(20);
+        $orders = $query->with(['restaurantTable', 'createdBy'])->orderBy('created_at', 'desc')->paginate(20);
         $totalRevenue = $query->where('order_status', '!=', 'dibatalkan')->sum('total');
         $totalOrders = $query->count();
 
-        return view('reports.sales', compact('orders', 'totalRevenue', 'totalOrders', 'period', 'startDate', 'endDate'));
+        return Inertia::render('Reports/Sales', [
+            'orders' => $orders,
+            'totalRevenue' => (float) $totalRevenue,
+            'totalOrders' => $totalOrders,
+            'filters' => [
+                'period' => $period,
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
-    public function show(Order $order): View
+    public function show(Order $order): InertiaResponse
     {
         $order->load(['orderItems.menuItem.category', 'payments', 'restaurantTable', 'createdBy', 'customer']);
 
-        return view('reports.sales-detail', [
+        return Inertia::render('Reports/SalesDetail', [
             'order' => $order,
         ]);
     }
@@ -106,22 +116,37 @@ class ReportController extends Controller
         }
     }
 
-    public function popularMenu(Request $request): View
+    public function popularMenu(Request $request): InertiaResponse
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
 
-        $popularItems = MenuItem::withCount(['orderItems as total_orders' => function ($query) use ($startDate, $endDate) {
-            $query->whereHas('order', function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('created_at', [$startDate, $endDate])
-                    ->where('order_status', '!=', 'dibatalkan');
-            });
-        }])->orderBy('total_orders', 'desc')->paginate(20);
+        $popularItems = MenuItem::with('category')
+            ->withCount(['orderItems as total_orders' => function ($query) use ($startDate, $endDate) {
+                $query->whereHas('order', function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('created_at', [$startDate, $endDate])
+                        ->where('order_status', '!=', 'dibatalkan');
+                });
+            }])
+            ->withSum(['orderItems as total_qty' => function ($query) use ($startDate, $endDate) {
+                $query->whereHas('order', function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('created_at', [$startDate, $endDate])
+                        ->where('order_status', '!=', 'dibatalkan');
+                });
+            }], 'quantity')
+            ->orderBy('total_orders', 'desc')
+            ->paginate(20);
 
-        return view('reports.popular-menu', compact('popularItems', 'startDate', 'endDate'));
+        return Inertia::render('Reports/PopularMenu', [
+            'popularItems' => $popularItems,
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
-    public function tables(Request $request): View
+    public function tables(Request $request): InertiaResponse
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
@@ -130,7 +155,13 @@ class ReportController extends Controller
             $query->whereBetween('created_at', [$startDate, $endDate]);
         }])->orderBy('table_number')->get();
 
-        return view('reports.tables', compact('tableUsage', 'startDate', 'endDate'));
+        return Inertia::render('Reports/Tables', [
+            'tableUsage' => $tableUsage,
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
     public function exportSales(Request $request): Response

@@ -7,22 +7,27 @@ use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class MenuItemController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $menuItems = MenuItem::with('category')->orderBy('sort_order')->paginate(20);
 
-        return view('admin.menu-items.index', compact('menuItems'));
+        return Inertia::render('Admin/MenuItems/Index', [
+            'menuItems' => $menuItems,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
         $categories = MenuCategory::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('admin.menu-items.create', compact('categories'));
+        return Inertia::render('Admin/MenuItems/Create', [
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -48,11 +53,14 @@ class MenuItemController extends Controller
         return redirect()->route('admin.menu-items.index')->with('success', 'Menu berhasil dibuat.');
     }
 
-    public function edit(MenuItem $menuItem): View
+    public function edit(MenuItem $menuItem): Response
     {
         $categories = MenuCategory::where('is_active', true)->orderBy('sort_order')->get();
 
-        return view('admin.menu-items.edit', compact('menuItem', 'categories'));
+        return Inertia::render('Admin/MenuItems/Edit', [
+            'menuItem' => $menuItem,
+            'categories' => $categories,
+        ]);
     }
 
     public function update(Request $request, MenuItem $menuItem): RedirectResponse

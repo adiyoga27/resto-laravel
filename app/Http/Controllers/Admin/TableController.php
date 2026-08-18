@@ -8,20 +8,23 @@ use App\Models\RestaurantTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TableController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $tables = RestaurantTable::orderBy('table_number')->paginate(20);
 
-        return view('admin.tables.index', compact('tables'));
+        return Inertia::render('Admin/Tables/Index', [
+            'tables' => $tables,
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('admin.tables.create');
+        return Inertia::render('Admin/Tables/Create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -37,11 +40,21 @@ class TableController extends Controller
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil dibuat.');
     }
 
-    public function edit(RestaurantTable $table): View
+    public function edit(RestaurantTable $table): Response
     {
-        $statuses = TableStatus::cases();
+        $statuses = collect(TableStatus::cases())->map(fn ($status) => [
+            'value' => $status->value,
+            'label' => match ($status) {
+                TableStatus::Kosong => 'Kosong',
+                TableStatus::Terisi => 'Terisi',
+                TableStatus::Direservasi => 'Direservasi',
+            },
+        ]);
 
-        return view('admin.tables.edit', compact('table', 'statuses'));
+        return Inertia::render('Admin/Tables/Edit', [
+            'table' => $table,
+            'statuses' => $statuses,
+        ]);
     }
 
     public function update(Request $request, RestaurantTable $table): RedirectResponse

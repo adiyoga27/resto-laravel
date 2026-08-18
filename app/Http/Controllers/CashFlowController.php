@@ -9,16 +9,17 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class CashFlowController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): InertiaResponse
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
 
-        $entries = CashFlow::betweenDates($startDate, $endDate)
+        $entries = CashFlow::with('creator')->betweenDates($startDate, $endDate)
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -32,21 +33,32 @@ class CashFlowController extends Controller
         $totalKredit = $totals->total_kredit ?? 0;
         $saldo = $totalDebit - $totalKredit;
 
-        return view('reports.cash-flow', compact('entries', 'startDate', 'endDate', 'totalDebit', 'totalKredit', 'saldo'));
+        return Inertia::render('Reports/CashFlow', [
+            'entries' => $entries,
+            'totalDebit' => (float) $totalDebit,
+            'totalKredit' => (float) $totalKredit,
+            'saldo' => (float) $saldo,
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
-    public function create(): View
+    public function create(): InertiaResponse
     {
-        return view('reports.cash-flow.create');
+        return Inertia::render('Reports/CashFlowCreate');
     }
 
-    public function edit(CashFlow $cashFlow): View
+    public function edit(CashFlow $cashFlow): InertiaResponse
     {
         if ($cashFlow->is_posted) {
             abort(403);
         }
 
-        return view('reports.cash-flow.edit', compact('cashFlow'));
+        return Inertia::render('Reports/CashFlowEdit', [
+            'cashFlow' => $cashFlow,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -129,7 +141,7 @@ class CashFlowController extends Controller
             ->with('success', 'Posting entri arus kas berhasil dibatalkan.');
     }
 
-    public function posting(Request $request): View
+    public function posting(Request $request): InertiaResponse
     {
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
@@ -140,7 +152,13 @@ class CashFlowController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('reports.cash-flow.posting', compact('orders', 'startDate', 'endDate'));
+        return Inertia::render('Reports/CashFlowPosting', [
+            'orders' => $orders,
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+            ],
+        ]);
     }
 
     public function postTransaction(Request $request): RedirectResponse

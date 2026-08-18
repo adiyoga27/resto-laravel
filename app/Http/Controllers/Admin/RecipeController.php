@@ -8,11 +8,12 @@ use App\Models\MenuItem;
 use App\Models\RecipeItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RecipeController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $menuItemId = $request->get('menu_item_id');
         $menuItems = MenuItem::with('category')->orderBy('name')->get();
@@ -24,7 +25,12 @@ class RecipeController extends Controller
             ->get()
             ->groupBy('menu_item_id');
 
-        return view('admin.recipes.index', compact('menuItems', 'ingredients', 'recipes', 'menuItemId'));
+        return Inertia::render('Admin/Recipes/Index', [
+            'menuItems' => $menuItems,
+            'ingredients' => $ingredients,
+            'recipes' => $recipes,
+            'menuItemId' => $menuItemId,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

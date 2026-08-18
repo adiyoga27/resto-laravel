@@ -9,11 +9,12 @@ use App\Services\ExcelExport;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(): InertiaResponse
     {
         $totalOrders = Order::count();
         $totalRevenue = Order::where('order_status', 'selesai')->sum('total');
@@ -24,10 +25,15 @@ class DashboardController extends Controller
         $weeklyData = $this->getWeeklyData();
         $monthlyData = $this->getMonthlyData();
 
-        return view('admin.dashboard', compact(
-            'totalOrders', 'totalRevenue', 'activeOrders', 'totalCustomers',
-            'dailyData', 'weeklyData', 'monthlyData'
-        ));
+        return Inertia::render('Dashboard', [
+            'totalOrders' => $totalOrders,
+            'totalRevenue' => (float) $totalRevenue,
+            'activeOrders' => $activeOrders,
+            'totalCustomers' => $totalCustomers,
+            'dailyData' => $dailyData,
+            'weeklyData' => $weeklyData,
+            'monthlyData' => $monthlyData,
+        ]);
     }
 
     private function getDailyData(): array
@@ -60,29 +66,34 @@ class DashboardController extends Controller
 
     private function getWeeklyData(): array
     {
-        $sales = Order::select(
-            DB::raw('YEARWEEK(created_at, 1) as week'),
-            DB::raw('MIN(DATE(created_at)) as week_start'),
-            DB::raw('SUM(total) as revenue'),
-            DB::raw('COUNT(*) as orders')
-        )
+        $sales = Order::select('created_at', 'total')
             ->where('order_status', 'selesai')
             ->where('created_at', '>=', now()->subWeeks(12))
-            ->groupBy(DB::raw('YEARWEEK(created_at, 1)'))
-            ->orderBy('week')
             ->get();
+
+        $weeks = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $start = now()->subWeeks($i)->startOfWeek(Carbon::MONDAY);
+            $weeks[$start->format('Y-W')] = ['start' => $start, 'revenue' => 0, 'orders' => 0];
+        }
+
+        foreach ($sales as $sale) {
+            $key = $sale->created_at->startOfWeek(Carbon::MONDAY)->format('Y-W');
+            if (isset($weeks[$key])) {
+                $weeks[$key]['revenue'] += (float) $sale->total;
+                $weeks[$key]['orders'] += 1;
+            }
+        }
 
         $labels = [];
         $revenue = [];
         $orders = [];
 
-        for ($i = 11; $i >= 0; $i--) {
-            $start = now()->subWeeks($i)->startOfWeek(Carbon::MONDAY);
-            $end = $start->copy()->endOfWeek(Carbon::SUNDAY);
-            $labels[] = $start->translatedFormat('d M').' - '.$end->translatedFormat('d M');
-            $sale = $sales->firstWhere('week_start', $start->format('Y-m-d'));
-            $revenue[] = $sale ? (float) $sale->revenue : 0;
-            $orders[] = $sale ? (int) $sale->orders : 0;
+        foreach ($weeks as $week) {
+            $end = $week['start']->copy()->endOfWeek(Carbon::SUNDAY);
+            $labels[] = $week['start']->translatedFormat('d M').' - '.$end->translatedFormat('d M');
+            $revenue[] = $week['revenue'];
+            $orders[] = $week['orders'];
         }
 
         return ['labels' => $labels, 'revenue' => $revenue, 'orders' => $orders];
@@ -90,15 +101,9 @@ class DashboardController extends Controller
 
     private function getMonthlyData(): array
     {
-        $sales = Order::select(
-            DB::raw('MONTH(created_at) as month'),
-            DB::raw('SUM(total) as revenue'),
-            DB::raw('COUNT(*) as orders')
-        )
+        $sales = Order::select('created_at', 'total')
             ->where('order_status', 'selesai')
             ->whereYear('created_at', now()->year)
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->orderBy(DB::raw('MONTH(created_at)'))
             ->get();
 
         $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -106,8 +111,9 @@ class DashboardController extends Controller
         $orders = array_fill(0, 12, 0);
 
         foreach ($sales as $sale) {
-            $revenue[$sale->month - 1] = (float) $sale->revenue;
-            $orders[$sale->month - 1] = (int) $sale->orders;
+            $month = (int) $sale->created_at->format('n') - 1;
+            $revenue[$month] += (float) $sale->total;
+            $orders[$month] += 1;
         }
 
         return ['labels' => $monthNames, 'revenue' => $revenue, 'orders' => $orders];
