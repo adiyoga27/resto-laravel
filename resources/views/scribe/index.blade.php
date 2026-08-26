@@ -3732,10 +3732,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="actions.0.action_type"                data-endpoint="POSTapi-v1-sync"
-               value="reservation"
+               value="order"
                data-component="body">
     <br>
-<p>Example: <code>reservation</code></p>
+<p>Example: <code>order</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>order</code></li> <li><code>reservation</code></li></ul>
                     </div>
