@@ -26,7 +26,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "https://pos.codingajaindonesia.my.id";
+        var tryItOutBaseUrl = "https://shadja.my.id";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -194,7 +194,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: August 8, 2026</li>
+        <li>Last updated: August 26, 2026</li>
     </ul>
 </div>
 
@@ -203,7 +203,7 @@
     <div class="content">
         <h1 id="introduction">Introduction</h1>
 <aside>
-    <strong>Base URL</strong>: <code>https://pos.codingajaindonesia.my.id</code>
+    <strong>Base URL</strong>: <code>https://shadja.my.id</code>
 </aside>
 <pre><code>This documentation aims to provide all the information you need to work with our API.
 
@@ -230,7 +230,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/register" \
+    "https://shadja.my.id/api/v1/auth/register" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -245,7 +245,7 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/register"
+    "https://shadja.my.id/api/v1/auth/register"
 );
 
 const headers = {
@@ -433,7 +433,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/login" \
+    "https://shadja.my.id/api/v1/auth/login" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -445,7 +445,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/login"
+    "https://shadja.my.id/api/v1/auth/login"
 );
 
 const headers = {
@@ -604,14 +604,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/logout" \
+    "https://shadja.my.id/api/v1/auth/logout" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/auth/logout"
+    "https://shadja.my.id/api/v1/auth/logout"
 );
 
 const headers = {
@@ -729,14 +729,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/menu" \
+    --get "https://shadja.my.id/api/v1/menu" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/menu"
+    "https://shadja.my.id/api/v1/menu"
 );
 
 const headers = {
@@ -863,14 +863,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/menu/1" \
+    --get "https://shadja.my.id/api/v1/menu/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/menu/1"
+    "https://shadja.my.id/api/v1/menu/1"
 );
 
 const headers = {
@@ -1021,7 +1021,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/orders" \
+    "https://shadja.my.id/api/v1/orders" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1041,7 +1041,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/orders"
+    "https://shadja.my.id/api/v1/orders"
 );
 
 const headers = {
@@ -1372,14 +1372,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/orders" \
+    --get "https://shadja.my.id/api/v1/orders" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/orders"
+    "https://shadja.my.id/api/v1/orders"
 );
 
 const headers = {
@@ -1520,14 +1520,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/orders/1" \
+    --get "https://shadja.my.id/api/v1/orders/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/orders/1"
+    "https://shadja.my.id/api/v1/orders/1"
 );
 
 const headers = {
@@ -1688,7 +1688,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "https://pos.codingajaindonesia.my.id/api/v1/orders/1/status" \
+    "https://shadja.my.id/api/v1/orders/1/status" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1699,7 +1699,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/orders/1/status"
+    "https://shadja.my.id/api/v1/orders/1/status"
 );
 
 const headers = {
@@ -1868,13 +1868,15 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/payments/callback" \
+    "https://shadja.my.id/api/v1/payments/callback" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
     \"order_id\": 1,
-    \"method\": \"qris\",
-    \"amount\": \"55500\",
+    \"method\": \"cash\",
+    \"amount\": \"22200\",
+    \"cash_received\": \"50000\",
+    \"change\": \"27800\",
     \"reference\": \"architecto\"
 }"
 </code></pre></div>
@@ -1882,7 +1884,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/payments/callback"
+    "https://shadja.my.id/api/v1/payments/callback"
 );
 
 const headers = {
@@ -1892,8 +1894,10 @@ const headers = {
 
 let body = {
     "order_id": 1,
-    "method": "qris",
-    "amount": "55500",
+    "method": "cash",
+    "amount": "22200",
+    "cash_received": "50000",
+    "change": "27800",
     "reference": "architecto"
 };
 
@@ -1914,9 +1918,12 @@ fetch(url, {
 <code class="language-json" style="max-height: 300px;">{
     &quot;id&quot;: 1,
     &quot;order_id&quot;: 1,
-    &quot;method&quot;: &quot;qris&quot;,
-    &quot;amount&quot;: 55500,
-    &quot;status&quot;: &quot;paid&quot;
+    &quot;method&quot;: &quot;cash&quot;,
+    &quot;amount&quot;: 22200,
+    &quot;cash_received&quot;: 50000,
+    &quot;change&quot;: 27800,
+    &quot;status&quot;: &quot;paid&quot;,
+    &quot;reference&quot;: null
 }</code>
  </pre>
     </span>
@@ -2011,10 +2018,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="method"                data-endpoint="POSTapi-v1-payments-callback"
-               value="qris"
+               value="cash"
                data-component="body">
     <br>
-<p>Payment method (cash/qris/transfer/card). Example: <code>qris</code></p>
+<p>Payment method (cash/qris/transfer/card). Example: <code>cash</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
@@ -2023,10 +2030,34 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="amount"                data-endpoint="POSTapi-v1-payments-callback"
-               value="55500"
+               value="22200"
                data-component="body">
     <br>
-<p>Payment amount. Example: <code>55500</code></p>
+<p>Payment amount. Example: <code>22200</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>cash_received</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="cash_received"                data-endpoint="POSTapi-v1-payments-callback"
+               value="50000"
+               data-component="body">
+    <br>
+<p>Uang yang diterima untuk pembayaran tunai. Dikosongkan jika bukan tunai. Example: <code>50000</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>change</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="change"                data-endpoint="POSTapi-v1-payments-callback"
+               value="27800"
+               data-component="body">
+    <br>
+<p>Kembalian yang diberikan (cash_received - amount). Dikosongkan jika bukan tunai atau kembalian 0. Example: <code>27800</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>reference</code></b>&nbsp;&nbsp;
@@ -2056,14 +2087,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/payments/1" \
+    --get "https://shadja.my.id/api/v1/payments/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/payments/1"
+    "https://shadja.my.id/api/v1/payments/1"
 );
 
 const headers = {
@@ -2088,8 +2119,10 @@ fetch(url, {
 <code class="language-json" style="max-height: 300px;">{
     &quot;id&quot;: 1,
     &quot;order_id&quot;: 1,
-    &quot;method&quot;: &quot;qris&quot;,
-    &quot;amount&quot;: 55500,
+    &quot;method&quot;: &quot;cash&quot;,
+    &quot;amount&quot;: 22200,
+    &quot;cash_received&quot;: 50000,
+    &quot;change&quot;: 27800,
     &quot;status&quot;: &quot;paid&quot;,
     &quot;reference&quot;: null,
     &quot;order&quot;: {
@@ -2215,14 +2248,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/profile" \
+    --get "https://shadja.my.id/api/v1/profile" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/profile"
+    "https://shadja.my.id/api/v1/profile"
 );
 
 const headers = {
@@ -2344,14 +2377,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/reservations" \
+    --get "https://shadja.my.id/api/v1/reservations" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/reservations"
+    "https://shadja.my.id/api/v1/reservations"
 );
 
 const headers = {
@@ -2476,7 +2509,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/reservations" \
+    "https://shadja.my.id/api/v1/reservations" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2490,7 +2523,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/reservations"
+    "https://shadja.my.id/api/v1/reservations"
 );
 
 const headers = {
@@ -2668,14 +2701,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/reservations/16" \
+    --get "https://shadja.my.id/api/v1/reservations/16" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/reservations/16"
+    "https://shadja.my.id/api/v1/reservations/16"
 );
 
 const headers = {
@@ -2827,7 +2860,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/sync" \
+    "https://shadja.my.id/api/v1/sync" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2841,7 +2874,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/sync"
+    "https://shadja.my.id/api/v1/sync"
 );
 
 const headers = {
@@ -2982,10 +3015,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="actions.0.action_type"                data-endpoint="POSTapi-v1-sync"
-               value="order"
+               value="reservation"
                data-component="body">
     <br>
-<p>Example: <code>order</code></p>
+<p>Example: <code>reservation</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>order</code></li> <li><code>reservation</code></li></ul>
                     </div>
@@ -3085,14 +3118,14 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/tables?status=kosong" \
+    --get "https://shadja.my.id/api/v1/tables?status=kosong" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/tables"
+    "https://shadja.my.id/api/v1/tables"
 );
 
 const params = {
@@ -3230,7 +3263,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "https://pos.codingajaindonesia.my.id/api/v1/tables" \
+    "https://shadja.my.id/api/v1/tables" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -3242,7 +3275,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/tables"
+    "https://shadja.my.id/api/v1/tables"
 );
 
 const headers = {
@@ -3389,14 +3422,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "https://pos.codingajaindonesia.my.id/api/v1/tables/1" \
+    --get "https://shadja.my.id/api/v1/tables/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/tables/1"
+    "https://shadja.my.id/api/v1/tables/1"
 );
 
 const headers = {
@@ -3538,7 +3571,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "https://pos.codingajaindonesia.my.id/api/v1/tables/1" \
+    "https://shadja.my.id/api/v1/tables/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -3551,7 +3584,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/tables/1"
+    "https://shadja.my.id/api/v1/tables/1"
 );
 
 const headers = {
@@ -3736,14 +3769,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "https://pos.codingajaindonesia.my.id/api/v1/tables/1" \
+    "https://shadja.my.id/api/v1/tables/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "https://pos.codingajaindonesia.my.id/api/v1/tables/1"
+    "https://shadja.my.id/api/v1/tables/1"
 );
 
 const headers = {

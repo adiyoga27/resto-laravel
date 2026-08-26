@@ -40,7 +40,7 @@ endpoints:
         name: method
         description: 'Payment method (cash/qris/transfer/card).'
         required: true
-        example: qris
+        example: cash
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -51,11 +51,33 @@ endpoints:
         name: amount
         description: 'Payment amount.'
         required: true
-        example: '55500'
+        example: '22200'
         type: numeric
         enumValues: []
         exampleWasSpecified: true
         nullable: false
+        deprecated: false
+      cash_received:
+        custom: []
+        name: cash_received
+        description: 'Uang yang diterima untuk pembayaran tunai. Dikosongkan jika bukan tunai.'
+        required: false
+        example: '50000'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      change:
+        custom: []
+        name: change
+        description: 'Kembalian yang diberikan (cash_received - amount). Dikosongkan jika bukan tunai atau kembalian 0.'
+        required: false
+        example: '27800'
+        type: numeric
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
         deprecated: false
       reference:
         custom: []
@@ -70,15 +92,17 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       order_id: 1
-      method: qris
-      amount: '55500'
+      method: cash
+      amount: '22200'
+      cash_received: '50000'
+      change: '27800'
       reference: architecto
     fileParameters: []
     responses:
       -
         custom: []
         status: 201
-        content: '{"id":1,"order_id":1,"method":"qris","amount":55500,"status":"paid"}'
+        content: '{"id":1,"order_id":1,"method":"cash","amount":22200,"cash_received":50000,"change":27800,"status":"paid","reference":null}'
         headers: []
         description: ''
     responseFields: []
@@ -139,7 +163,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":1,"order_id":1,"method":"qris","amount":55500,"status":"paid","reference":null,"order":{"id":1,"order_number":"ORD-20260101-ABC123"}}'
+        content: '{"id":1,"order_id":1,"method":"cash","amount":22200,"cash_received":50000,"change":27800,"status":"paid","reference":null,"order":{"id":1,"order_number":"ORD-20260101-ABC123"}}'
         headers: []
         description: ''
     responseFields: []

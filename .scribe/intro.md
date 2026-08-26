@@ -3,7 +3,7 @@
 
 
 <aside>
-    <strong>Base URL</strong>: <code>https://pos.codingajaindonesia.my.id</code>
+    <strong>Base URL</strong>: <code>https://shadja.my.id</code>
 </aside>
 
     This documentation aims to provide all the information you need to work with our API.
