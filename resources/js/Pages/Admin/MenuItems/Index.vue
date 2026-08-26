@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 import PageHeader from '../../../Components/PageHeader.vue';
 import Pagination from '../../../Components/Pagination.vue';
@@ -10,7 +10,26 @@ import { money } from '../../../utils/format';
 
 const props = defineProps({
     menuItems: Object,
+    categories: Array,
+    filters: Object,
 });
+
+const filterForm = useForm({
+    search: props.filters.search ?? '',
+    category_id: props.filters.category_id ?? '',
+    status: props.filters.status ?? '',
+});
+
+const applyFilter = () => {
+    filterForm.get(route('admin.menu-items.index'), { preserveState: true });
+};
+
+const resetFilter = () => {
+    filterForm.search = '';
+    filterForm.category_id = '';
+    filterForm.status = '';
+    applyFilter();
+};
 
 const deleting = ref(null);
 const busy = ref(false);
@@ -41,6 +60,34 @@ defineOptions({ layout: AppLayout });
                 Tambah Menu
             </Link>
         </PageHeader>
+
+        <div class="card mb-4 p-4">
+            <form class="flex flex-col gap-3 sm:flex-row sm:items-end" @submit.prevent="applyFilter">
+                <div class="sm:flex-1">
+                    <label class="label">Cari Menu</label>
+                    <input v-model="filterForm.search" type="text" class="input" placeholder="Cari nama atau deskripsi...">
+                </div>
+                <div class="sm:w-48">
+                    <label class="label">Kategori</label>
+                    <select v-model="filterForm.category_id" class="input">
+                        <option value="">Semua Kategori</option>
+                        <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                    </select>
+                </div>
+                <div class="sm:w-40">
+                    <label class="label">Status</label>
+                    <select v-model="filterForm.status" class="input">
+                        <option value="">Semua</option>
+                        <option value="active">Aktif</option>
+                        <option value="inactive">Nonaktif</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="btn-secondary">Terapkan</button>
+                    <button type="button" class="btn-ghost border border-slate-300" @click="resetFilter">Reset</button>
+                </div>
+            </form>
+        </div>
 
         <div class="card overflow-hidden">
             <div class="overflow-x-auto">

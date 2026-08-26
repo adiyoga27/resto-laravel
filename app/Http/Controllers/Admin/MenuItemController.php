@@ -12,12 +12,31 @@ use Inertia\Response;
 
 class MenuItemController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $menuItems = MenuItem::with('category')->orderBy('sort_order')->paginate(20);
+        $menuItems = MenuItem::with('category')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $query->where(function ($query) use ($request) {
+                    $query->where('name', 'like', '%'.$request->string('search').'%')
+                        ->orWhere('description', 'like', '%'.$request->string('search').'%');
+                });
+            })
+            ->when($request->filled('category_id'), fn ($query) => $query->where('menu_category_id', $request->integer('category_id')))
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $request->string('status')->is('active')
+                    ? $query->where('is_active', true)
+                    : $query->where('is_active', false);
+            })
+            ->orderBy('sort_order')
+            ->paginate(20)
+            ->withQueryString();
+
+        $categories = MenuCategory::orderBy('sort_order')->get();
 
         return Inertia::render('Admin/MenuItems/Index', [
             'menuItems' => $menuItems,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'category_id', 'status']),
         ]);
     }
 
