@@ -23,6 +23,7 @@ const customerName = ref('');
 const customerPhone = ref('');
 const notes = ref('');
 const paymentMethod = ref('cash');
+const cashReceived = ref(null);
 const bankName = ref('');
 const accountNumber = ref('');
 const showSuccess = ref(false);
@@ -42,6 +43,7 @@ const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + item.
 const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.value || 0)));
 const cartTax = computed(() => afterDiscount.value * 0.11);
 const cartTotal = computed(() => afterDiscount.value + cartTax.value);
+const cashChange = computed(() => (paymentMethod.value === 'cash' && cashReceived.value !== null ? Math.max(0, Number(cashReceived.value) - cartTotal.value) : 0));
 const cartCount = computed(() => cart.value.reduce((sum, item) => sum + item.qty, 0));
 const cartTitle = computed(() => (editingOrderId.value ? 'Edit Pesanan' : 'Pesanan Baru'));
 const activeTables = computed(() => props.tables.filter((t) => t.status === 'kosong'));
@@ -88,6 +90,7 @@ const resetCart = () => {
     customerPhone.value = '';
     notes.value = '';
     paymentMethod.value = 'cash';
+    cashReceived.value = null;
     showSuccess.value = false;
 };
 
@@ -120,6 +123,7 @@ const submitOrder = () => {
         customer_phone: customerPhone.value,
         payment_method: paymentMethod.value,
         payment_amount: cartTotal.value,
+        cash_received: cashReceived.value,
         discount: discount.value,
         payment_reference: paymentReference,
         notes: notes.value,
@@ -403,6 +407,16 @@ defineOptions({ layout: AppLayout });
                                 <option value="transfer">Transfer Bank</option>
                                 <option value="card">Kartu</option>
                             </select>
+                        </div>
+                        <div v-if="paymentMethod === 'cash'" class="space-y-2">
+                            <div>
+                                <label class="label">Uang Diberikan (Rp)</label>
+                                <input v-model.number="cashReceived" type="number" min="0" step="0.01" class="input" placeholder="Masukkan uang tunai (opsional)">
+                            </div>
+                            <div v-if="cashReceived !== null" class="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-sm">
+                                <span class="font-medium text-emerald-700">Kembalian</span>
+                                <span class="font-bold text-emerald-700">{{ money(cashChange) }}</span>
+                            </div>
                         </div>
                         <div v-if="paymentMethod === 'transfer'" class="grid grid-cols-2 gap-2">
                             <input v-model="bankName" type="text" class="input" placeholder="Nama Bank">

@@ -74,6 +74,7 @@ class PosController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'payment_method' => ['required', 'string', 'in:cash,qris,transfer,card'],
             'payment_amount' => ['required', 'numeric', 'min:0'],
+            'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
@@ -132,10 +133,14 @@ class PosController extends Controller
 
         $reference = $validated['payment_reference'] ?? null;
 
+        $cashReceived = $validated['cash_received'] ?? null;
+
         Payment::create([
             'order_id' => $order->id,
             'method' => PaymentMethod::from($validated['payment_method']),
             'amount' => $validated['payment_amount'],
+            'cash_received' => $cashReceived,
+            'change' => ($cashReceived !== null) ? max(0, round($cashReceived - $total, 2)) : null,
             'status' => PaymentStatus::Paid,
             'reference' => $reference,
         ]);
@@ -168,6 +173,7 @@ class PosController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'payment_method' => ['required', 'string', 'in:cash,qris,transfer,card'],
             'payment_amount' => ['required', 'numeric', 'min:0'],
+            'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
@@ -210,10 +216,14 @@ class PosController extends Controller
 
         $reference = $validated['payment_reference'] ?? null;
 
+        $cashReceived = $validated['cash_received'] ?? null;
+
         Payment::create([
             'order_id' => $order->id,
             'method' => PaymentMethod::from($validated['payment_method']),
             'amount' => $validated['payment_amount'],
+            'cash_received' => $cashReceived,
+            'change' => ($cashReceived !== null) ? max(0, round($cashReceived - $total, 2)) : null,
             'status' => PaymentStatus::Paid,
             'reference' => $reference,
         ]);

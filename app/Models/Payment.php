@@ -12,7 +12,7 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'method', 'amount', 'status', 'reference', 'notes'];
+    protected $fillable = ['order_id', 'method', 'amount', 'cash_received', 'change', 'status', 'reference', 'notes'];
 
     protected function casts(): array
     {
@@ -20,6 +20,8 @@ class Payment extends Model
             'method' => PaymentMethod::class,
             'status' => PaymentStatus::class,
             'amount' => 'decimal:2',
+            'cash_received' => 'decimal:2',
+            'change' => 'decimal:2',
         ];
     }
 

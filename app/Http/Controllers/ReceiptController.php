@@ -41,6 +41,8 @@ class ReceiptController extends Controller
                 'payments' => $order->payments->map(fn ($payment) => [
                     'method' => $payment->method->label(),
                     'amount' => (float) $payment->amount,
+                    'cash_received' => $payment->cash_received !== null ? (float) $payment->cash_received : null,
+                    'change' => $payment->change !== null ? (float) $payment->change : null,
                     'reference' => $payment->reference,
                 ]),
             ],

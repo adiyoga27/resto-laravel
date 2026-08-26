@@ -139,6 +139,12 @@ export function buildReceiptData(receipt) {
     (o.payments || []).forEach((p) => {
         txt('Bayar (' + p.method + ')' + (p.reference ? ' - ' + p.reference : ''));
         txt('  Jumlah'.padEnd(W - 12) + padLeft(money(p.amount), 12));
+        if (p.cash_received != null) {
+            txt('  Uang   '.padEnd(W - 12) + padLeft(money(p.cash_received), 12));
+        }
+        if (p.change != null) {
+            txt('  Kembali'.padEnd(W - 12) + padLeft(money(p.change), 12));
+        }
     });
 
     if (o.notes) {
