@@ -21,7 +21,7 @@ class MenuController extends Controller
     public function index(): JsonResponse
     {
         $categories = MenuCategory::with(['menuItems' => function ($query) {
-            $query->where('is_active', true)->orderBy('sort_order');
+            $query->where('is_active', true)->orderBy('name');
         }])->where('is_active', true)->orderBy('sort_order')->get();
 
         return response()->json($categories);
