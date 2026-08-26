@@ -46,8 +46,7 @@ const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.
 const selectedAdditionalCost = computed(() => props.additionalCosts.find((c) => c.id === selectedAdditionalCostId.value));
 const serviceChargeRate = computed(() => (selectedAdditionalCost.value ? Number(selectedAdditionalCost.value.rate) : 0));
 const serviceCharge = computed(() => (serviceChargeRate.value > 0 ? Math.round(afterDiscount.value * (serviceChargeRate.value / 100) * 100) / 100 : 0));
-const cartTax = computed(() => afterDiscount.value * 0.11);
-const cartTotal = computed(() => afterDiscount.value + cartTax.value + serviceCharge.value);
+const cartTotal = computed(() => afterDiscount.value + serviceCharge.value);
 const cashChange = computed(() => (paymentMethod.value === 'cash' && cashReceived.value !== null ? Math.max(0, Number(cashReceived.value) - cartTotal.value) : 0));
 const cartCount = computed(() => cart.value.reduce((sum, item) => sum + item.qty, 0));
 const cartTitle = computed(() => (editingOrderId.value ? 'Edit Pesanan' : 'Pesanan Baru'));
@@ -393,9 +392,6 @@ defineOptions({ layout: AppLayout });
                         </div>
                         <div v-if="serviceCharge > 0" class="flex justify-between text-emerald-600">
                             <span>{{ selectedAdditionalCost.name }} ({{ serviceChargeRate }}%)</span><span class="font-semibold">{{ money(serviceCharge) }}</span>
-                        </div>
-                        <div class="flex justify-between text-slate-500">
-                            <span>Tax (11%)</span><span class="font-semibold">{{ money(cartTax) }}</span>
                         </div>
                         <div class="border-t-2 border-dashed border-slate-200 pt-2">
                             <div class="flex items-center justify-between">

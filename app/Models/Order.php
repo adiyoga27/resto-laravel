@@ -92,8 +92,8 @@ class Order extends Model
         $this->subtotal = $this->orderItems->sum('subtotal');
         $afterDiscount = max(0, $this->subtotal - $this->discount);
         $this->additional_cost = $this->additional_cost_rate ? round($afterDiscount * ($this->additional_cost_rate / 100), 2) : 0;
-        $this->tax = $afterDiscount * 0.11;
-        $this->total = $afterDiscount + $this->tax + $this->additional_cost;
+        $this->tax = 0;
+        $this->total = $afterDiscount + $this->additional_cost;
         $this->save();
     }
 

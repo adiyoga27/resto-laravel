@@ -1242,8 +1242,8 @@ fetch(url, {
     &quot;order_status&quot;: &quot;baru&quot;,
     &quot;subtotal&quot;: 50000,
     &quot;discount&quot;: 5000,
-    &quot;tax&quot;: 4950,
-    &quot;total&quot;: 49950,
+    &quot;tax&quot;: 0,
+    &quot;total&quot;: 45000,
     &quot;customer_name&quot;: &quot;John Doe&quot;,
     &quot;customer_phone&quot;: &quot;08123456789&quot;,
     &quot;order_items&quot;: [
@@ -1580,8 +1580,8 @@ fetch(url, {
         &quot;order_status&quot;: &quot;baru&quot;,
         &quot;subtotal&quot;: 50000,
         &quot;discount&quot;: 0,
-        &quot;tax&quot;: 5500,
-        &quot;total&quot;: 55500,
+        &quot;tax&quot;: 0,
+        &quot;total&quot;: 50000,
         &quot;customer_name&quot;: &quot;John&quot;,
         &quot;customer_phone&quot;: &quot;08123456789&quot;,
         &quot;order_items&quot;: [
@@ -1727,8 +1727,8 @@ fetch(url, {
     &quot;order_status&quot;: &quot;baru&quot;,
     &quot;subtotal&quot;: 50000,
     &quot;discount&quot;: 0,
-    &quot;tax&quot;: 5500,
-    &quot;total&quot;: 55500,
+    &quot;tax&quot;: 0,
+    &quot;total&quot;: 50000,
     &quot;order_items&quot;: [
         {
             &quot;id&quot;: 1,
@@ -3732,10 +3732,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="actions.0.action_type"                data-endpoint="POSTapi-v1-sync"
-               value="order"
+               value="reservation"
                data-component="body">
     <br>
-<p>Example: <code>order</code></p>
+<p>Example: <code>reservation</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>order</code></li> <li><code>reservation</code></li></ul>
                     </div>

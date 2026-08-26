@@ -132,8 +132,7 @@ class PosController extends Controller
 
         $afterDiscount = max(0, $subtotal - $discount);
         $additionalCostAmount = $additionalCostRate > 0 ? round($afterDiscount * ($additionalCostRate / 100), 2) : 0;
-        $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax + $additionalCostAmount;
+        $total = $afterDiscount + $additionalCostAmount;
 
         $order->update([
             'subtotal' => $subtotal,
@@ -141,7 +140,7 @@ class PosController extends Controller
             'additional_cost_name' => $additionalCost?->name,
             'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
             'additional_cost' => $additionalCostAmount,
-            'tax' => $tax,
+            'tax' => 0,
             'total' => $total,
         ]);
 
@@ -219,8 +218,7 @@ class PosController extends Controller
 
         $afterDiscount = max(0, $subtotal - $discount);
         $additionalCostAmount = $additionalCostRate > 0 ? round($afterDiscount * ($additionalCostRate / 100), 2) : 0;
-        $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax + $additionalCostAmount;
+        $total = $afterDiscount + $additionalCostAmount;
 
         $order->update([
             'customer_name' => $validated['customer_name'] ?? $order->customer_name,
@@ -231,7 +229,7 @@ class PosController extends Controller
             'additional_cost_name' => $additionalCost?->name,
             'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
             'additional_cost' => $additionalCostAmount,
-            'tax' => $tax,
+            'tax' => 0,
             'total' => $total,
             'notes' => $validated['notes'] ?? $order->notes,
         ]);

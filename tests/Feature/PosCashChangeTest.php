@@ -21,7 +21,7 @@ test('kasir can store a cash order with cash received and change', function () {
             'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
             'customer_name' => 'Budi',
             'payment_method' => 'cash',
-            'payment_amount' => 22200,
+            'payment_amount' => 20000,
             'cash_received' => 50000,
             'discount' => 0,
         ])
@@ -31,12 +31,12 @@ test('kasir can store a cash order with cash received and change', function () {
     $order = Order::where('created_by', $kasir->id)->first();
     expect($order)->not->toBeNull();
     expect((float) $order->subtotal)->toBe(20000.0);
-    expect((float) $order->tax)->toBe(2200.0);
-    expect((float) $order->total)->toBe(22200.0);
+    expect((float) $order->tax)->toBe(0.0);
+    expect((float) $order->total)->toBe(20000.0);
 
     $payment = Payment::where('order_id', $order->id)->first();
     expect((float) $payment->cash_received)->toBe(50000.0);
-    expect((float) $payment->change)->toBe(27800.0);
+    expect((float) $payment->change)->toBe(30000.0);
 });
 
 test('kasir can store a cash order without cash received and change stays null', function () {
@@ -70,7 +70,7 @@ test('kasir can store an order with additional cost from master data', function 
             'order_type' => 'pickup',
             'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
             'payment_method' => 'qris',
-            'payment_amount' => 23200,
+            'payment_amount' => 21000,
             'additional_cost_id' => $cost->id,
             'discount' => 0,
         ])
@@ -81,8 +81,8 @@ test('kasir can store an order with additional cost from master data', function 
     expect($order->additional_cost_name)->toBe('Service Charge');
     expect((float) $order->additional_cost_rate)->toBe(5.0);
     expect((float) $order->additional_cost)->toBe(1000.0);
-    expect((float) $order->tax)->toBe(2200.0);
-    expect((float) $order->total)->toBe(23200.0);
+    expect((float) $order->tax)->toBe(0.0);
+    expect((float) $order->total)->toBe(21000.0);
 });
 
 test('additional cost is computed on amount after discount', function () {
@@ -95,7 +95,7 @@ test('additional cost is computed on amount after discount', function () {
             'order_type' => 'pickup',
             'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
             'payment_method' => 'cash',
-            'payment_amount' => 20880,
+            'payment_amount' => 18900,
             'cash_received' => 25000,
             'additional_cost_id' => $cost->id,
             'discount' => 2000,
@@ -106,11 +106,11 @@ test('additional cost is computed on amount after discount', function () {
     expect((float) $order->subtotal)->toBe(20000.0);
     expect((float) $order->discount)->toBe(2000.0);
     expect((float) $order->additional_cost)->toBe(900.0);
-    expect((float) $order->tax)->toBe(1980.0);
-    expect((float) $order->total)->toBe(20880.0);
+    expect((float) $order->tax)->toBe(0.0);
+    expect((float) $order->total)->toBe(18900.0);
 
     $payment = Payment::where('order_id', $order->id)->first();
-    expect((float) $payment->change)->toBe(4120.0);
+    expect((float) $payment->change)->toBe(6100.0);
 });
 
 test('receipt includes additional cost for orders with additional cost', function () {
@@ -159,8 +159,8 @@ test('recalculateTotals applies additional cost and discount', function () {
 
     expect((float) $order->subtotal)->toBe(20000.0);
     expect((float) $order->additional_cost)->toBe(900.0);
-    expect((float) $order->tax)->toBe(1980.0);
-    expect((float) $order->total)->toBe(20880.0);
+    expect((float) $order->tax)->toBe(0.0);
+    expect((float) $order->total)->toBe(18900.0);
 });
 
 test('receipt includes cash received and change for cash payment', function () {

@@ -24,7 +24,7 @@ class OrderController extends Controller
      *
      * @authenticated
      *
-     * @response 200 [{"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":0,"tax":5500,"total":55500,"customer_name":"John","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"notes":null,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}],"payments":[]}]
+     * @response 200 [{"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":0,"tax":0,"total":50000,"customer_name":"John","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"notes":null,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}],"payments":[]}]
      */
     public function index(): JsonResponse
     {
@@ -56,7 +56,7 @@ class OrderController extends Controller
      * @bodyParam additional_cost_id integer ID biaya tambahan dari master data. Example: 1
      * @bodyParam notes string Optional order notes.
      *
-     * @response 201 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":5000,"tax":4950,"total":49950,"customer_name":"John Doe","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}]}
+     * @response 201 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":5000,"tax":0,"total":45000,"customer_name":"John Doe","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}]}
      */
     public function store(Request $request): JsonResponse
     {
@@ -126,8 +126,7 @@ class OrderController extends Controller
 
         $afterDiscount = max(0, $subtotal - $discount);
         $additionalCostAmount = $additionalCostRate > 0 ? round($afterDiscount * ($additionalCostRate / 100), 2) : 0;
-        $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax + $additionalCostAmount;
+        $total = $afterDiscount + $additionalCostAmount;
 
         $order->update([
             'subtotal' => $subtotal,
@@ -135,7 +134,7 @@ class OrderController extends Controller
             'additional_cost_name' => $additionalCost?->name,
             'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
             'additional_cost' => $additionalCostAmount,
-            'tax' => $tax,
+            'tax' => 0,
             'total' => $total,
         ]);
 
@@ -151,7 +150,7 @@ class OrderController extends Controller
      *
      * @urlParam order integer required Order ID.
      *
-     * @response 200 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":0,"tax":5500,"total":55500,"order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}],"payments":[]}
+     * @response 200 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":0,"tax":0,"total":50000,"order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}],"payments":[]}
      */
     public function show(Order $order): JsonResponse
     {

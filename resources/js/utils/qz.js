@@ -131,7 +131,9 @@ export function buildReceiptData(receipt) {
     if (Number(o.additional_cost_rate) > 0) {
         txt((o.additional_cost_name || 'Biaya Tambahan') + ' (' + o.additional_cost_rate + '%)'.padEnd(W - 12) + padLeft(money(o.additional_cost), 12));
     }
-    txt('Tax (11%)'.padEnd(W - 12) + padLeft(money(o.tax), 12));
+    if (Number(o.tax) > 0) {
+        txt('Tax'.padEnd(W - 12) + padLeft(money(o.tax), 12));
+    }
     raw(ESC + 'E' + '\x01');
     raw(ESC + '!' + '\x10');
     txt('TOTAL'.padEnd(W - 12) + padLeft(money(o.total), 12));

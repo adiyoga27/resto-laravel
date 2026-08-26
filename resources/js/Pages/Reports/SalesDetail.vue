@@ -111,8 +111,8 @@ defineOptions({ layout: AppLayout });
                                     <th colspan="4" class="px-6 py-3 text-right text-sm text-rose-500">Diskon</th>
                                     <th class="px-6 py-3 text-right text-sm font-semibold text-rose-500">-{{ money(order.discount) }}</th>
                                 </tr>
-                                <tr>
-                                    <th colspan="4" class="px-6 py-3 text-right text-sm text-slate-500">Tax (11%)</th>
+                                <tr v-if="Number(order.tax) > 0">
+                                    <th colspan="4" class="px-6 py-3 text-right text-sm text-slate-500">Tax</th>
                                     <th class="px-6 py-3 text-right text-sm font-semibold">{{ money(order.tax) }}</th>
                                 </tr>
                                 <tr v-if="order.additional_cost_rate > 0">
