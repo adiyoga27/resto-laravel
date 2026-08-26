@@ -18,7 +18,7 @@ class Order extends Model
     protected $fillable = [
         'order_number', 'customer_id', 'restaurant_table_id', 'created_by',
         'channel', 'order_type', 'order_status', 'is_posted_to_cash_flow',
-        'subtotal', 'discount', 'service_charge_rate', 'service_charge', 'tax', 'total',
+        'subtotal', 'discount', 'additional_cost_id', 'additional_cost_name', 'additional_cost_rate', 'additional_cost', 'tax', 'total',
         'notes', 'delivery_address', 'customer_name', 'customer_phone',
     ];
 
@@ -31,8 +31,8 @@ class Order extends Model
             'is_posted_to_cash_flow' => 'boolean',
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
-            'service_charge_rate' => 'decimal:2',
-            'service_charge' => 'decimal:2',
+            'additional_cost_rate' => 'decimal:2',
+            'additional_cost' => 'decimal:2',
             'tax' => 'decimal:2',
             'total' => 'decimal:2',
         ];
@@ -67,6 +67,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function additionalCost(): BelongsTo
+    {
+        return $this->belongsTo(AdditionalCost::class, 'additional_cost_id');
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
@@ -86,9 +91,9 @@ class Order extends Model
     {
         $this->subtotal = $this->orderItems->sum('subtotal');
         $afterDiscount = max(0, $this->subtotal - $this->discount);
-        $this->service_charge = $this->service_charge_rate ? round($afterDiscount * ($this->service_charge_rate / 100), 2) : 0;
+        $this->additional_cost = $this->additional_cost_rate ? round($afterDiscount * ($this->additional_cost_rate / 100), 2) : 0;
         $this->tax = $afterDiscount * 0.11;
-        $this->total = $afterDiscount + $this->tax + $this->service_charge;
+        $this->total = $afterDiscount + $this->tax + $this->additional_cost;
         $this->save();
     }
 

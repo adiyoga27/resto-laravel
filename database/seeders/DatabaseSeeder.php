@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\TableStatus;
 use App\Enums\UserRole;
+use App\Models\AdditionalCost;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\RestaurantTable;
@@ -86,5 +87,19 @@ class DatabaseSeeder extends Seeder
                 'status' => TableStatus::Kosong,
             ]);
         }
+
+        AdditionalCost::create([
+            'name' => 'Service Charge',
+            'rate' => 5,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        AdditionalCost::create([
+            'name' => 'Air Minum',
+            'rate' => 1,
+            'is_active' => true,
+            'sort_order' => 2,
+        ]);
     }
 }

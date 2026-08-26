@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
 use App\Enums\TableStatus;
+use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\RestaurantTable;
@@ -62,8 +63,10 @@ class ReportController extends Controller
             'customer_phone' => ['nullable', 'string', 'max:20'],
             'notes' => ['nullable', 'string', 'max:500'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
         ]);
+
+        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
 
         $wasNotCompleted = $order->order_status !== OrderStatus::Selesai;
 
@@ -72,7 +75,9 @@ class ReportController extends Controller
             'customer_name' => $validated['customer_name'] ?? $order->customer_name,
             'customer_phone' => $validated['customer_phone'] ?? $order->customer_phone,
             'discount' => $validated['discount'] ?? $order->discount,
-            'service_charge_rate' => $validated['service_charge_rate'] ?? $order->service_charge_rate,
+            'additional_cost_id' => $additionalCost?->id,
+            'additional_cost_name' => $additionalCost?->name,
+            'additional_cost_rate' => $additionalCost?->rate,
             'notes' => $validated['notes'] ?? $order->notes,
         ]);
 

@@ -8,6 +8,7 @@ use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\TableStatus;
+use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -45,6 +46,7 @@ class PosController extends Controller
         return Inertia::render('Pos/Index', [
             'menuItems' => $menuItems,
             'tables' => $tables,
+            'additionalCosts' => AdditionalCost::active()->ordered()->get(),
             'activeOrders' => $activeOrders,
             'printer' => config('pos.printer'),
             'successOrder' => session('success_order_id') ? [
@@ -76,7 +78,7 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -88,7 +90,8 @@ class PosController extends Controller
         }
 
         $discount = (float) ($validated['discount'] ?? 0);
-        $serviceChargeRate = (float) ($validated['service_charge_rate'] ?? 0);
+        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
+        $additionalCostRate = $additionalCost?->rate !== null ? (float) $additionalCost->rate : 0;
 
         $order = Order::create([
             'customer_name' => $validated['customer_name'] ?? null,
@@ -100,8 +103,10 @@ class PosController extends Controller
             'order_status' => OrderStatus::Baru,
             'subtotal' => 0,
             'discount' => $discount,
-            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
-            'service_charge' => 0,
+            'additional_cost_id' => $additionalCost?->id,
+            'additional_cost_name' => $additionalCost?->name,
+            'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
+            'additional_cost' => 0,
             'tax' => 0,
             'total' => 0,
             'notes' => $validated['notes'] ?? null,
@@ -126,14 +131,16 @@ class PosController extends Controller
         }
 
         $afterDiscount = max(0, $subtotal - $discount);
-        $serviceCharge = $serviceChargeRate > 0 ? round($afterDiscount * ($serviceChargeRate / 100), 2) : 0;
+        $additionalCostAmount = $additionalCostRate > 0 ? round($afterDiscount * ($additionalCostRate / 100), 2) : 0;
         $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax + $serviceCharge;
+        $total = $afterDiscount + $tax + $additionalCostAmount;
 
         $order->update([
             'subtotal' => $subtotal,
-            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
-            'service_charge' => $serviceCharge,
+            'additional_cost_id' => $additionalCost?->id,
+            'additional_cost_name' => $additionalCost?->name,
+            'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
+            'additional_cost' => $additionalCostAmount,
             'tax' => $tax,
             'total' => $total,
         ]);
@@ -182,12 +189,13 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
         $discount = (float) ($validated['discount'] ?? 0);
-        $serviceChargeRate = (float) ($validated['service_charge_rate'] ?? 0);
+        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
+        $additionalCostRate = $additionalCost?->rate !== null ? (float) $additionalCost->rate : 0;
 
         $order->orderItems()->delete();
 
@@ -210,17 +218,19 @@ class PosController extends Controller
         }
 
         $afterDiscount = max(0, $subtotal - $discount);
-        $serviceCharge = $serviceChargeRate > 0 ? round($afterDiscount * ($serviceChargeRate / 100), 2) : 0;
+        $additionalCostAmount = $additionalCostRate > 0 ? round($afterDiscount * ($additionalCostRate / 100), 2) : 0;
         $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax + $serviceCharge;
+        $total = $afterDiscount + $tax + $additionalCostAmount;
 
         $order->update([
             'customer_name' => $validated['customer_name'] ?? $order->customer_name,
             'customer_phone' => $validated['customer_phone'] ?? $order->customer_phone,
             'subtotal' => $subtotal,
             'discount' => $discount,
-            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
-            'service_charge' => $serviceCharge,
+            'additional_cost_id' => $additionalCost?->id,
+            'additional_cost_name' => $additionalCost?->name,
+            'additional_cost_rate' => $additionalCostRate > 0 ? $additionalCostRate : null,
+            'additional_cost' => $additionalCostAmount,
             'tax' => $tax,
             'total' => $total,
             'notes' => $validated['notes'] ?? $order->notes,

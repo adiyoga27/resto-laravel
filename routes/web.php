@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Admin\AdditionalCostController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\MenuCategoryController;
@@ -44,6 +45,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('menu-categories', MenuCategoryController::class);
         Route::resource('menu-items', MenuItemController::class);
         Route::resource('tables', TableController::class);
+        Route::resource('additional-costs', AdditionalCostController::class);
         Route::resource('ingredients', IngredientController::class);
         Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
         Route::post('/recipes', [RecipeController::class, 'store'])->name('recipes.store');

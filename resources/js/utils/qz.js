@@ -128,8 +128,8 @@ export function buildReceiptData(receipt) {
     if (Number(o.discount) > 0) {
         txt('Diskon'.padEnd(W - 12) + padLeft('-' + money(o.discount), 12));
     }
-    if (Number(o.service_charge_rate) > 0) {
-        txt('Service (' + o.service_charge_rate + '%)'.padEnd(W - 12) + padLeft(money(o.service_charge), 12));
+    if (Number(o.additional_cost_rate) > 0) {
+        txt((o.additional_cost_name || 'Biaya Tambahan') + ' (' + o.additional_cost_rate + '%)'.padEnd(W - 12) + padLeft(money(o.additional_cost), 12));
     }
     txt('Tax (11%)'.padEnd(W - 12) + padLeft(money(o.tax), 12));
     raw(ESC + 'E' + '\x01');

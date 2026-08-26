@@ -8,6 +8,7 @@ import { setupQzSecurity, loadQzScript, printerSettings, buildReceiptData, print
 const props = defineProps({
     menuItems: Object,
     tables: Array,
+    additionalCosts: Array,
     activeOrders: Array,
     printer: Object,
     successOrder: Object,
@@ -17,7 +18,7 @@ const cart = ref([]);
 const selectedOrderType = ref('dine-in');
 const selectedTable = ref(null);
 const discount = ref(0);
-const serviceChargeRate = ref(0);
+const selectedAdditionalCostId = ref(null);
 const editingOrderId = ref(null);
 const search = ref('');
 const customerName = ref('');
@@ -42,6 +43,8 @@ const filteredCategories = computed(() => {
 
 const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + item.price * item.qty, 0));
 const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.value || 0)));
+const selectedAdditionalCost = computed(() => props.additionalCosts.find((c) => c.id === selectedAdditionalCostId.value));
+const serviceChargeRate = computed(() => (selectedAdditionalCost.value ? Number(selectedAdditionalCost.value.rate) : 0));
 const serviceCharge = computed(() => (serviceChargeRate.value > 0 ? Math.round(afterDiscount.value * (serviceChargeRate.value / 100) * 100) / 100 : 0));
 const cartTax = computed(() => afterDiscount.value * 0.11);
 const cartTotal = computed(() => afterDiscount.value + cartTax.value + serviceCharge.value);
@@ -87,7 +90,7 @@ const resetCart = () => {
     selectedOrderType.value = 'dine-in';
     selectedTable.value = null;
     discount.value = 0;
-    serviceChargeRate.value = 0;
+    selectedAdditionalCostId.value = null;
     editingOrderId.value = null;
     customerName.value = '';
     customerPhone.value = '';
@@ -128,7 +131,7 @@ const submitOrder = () => {
         payment_amount: cartTotal.value,
         cash_received: cashReceived.value,
         discount: discount.value,
-        service_charge_rate: serviceChargeRate.value,
+        additional_cost_id: selectedAdditionalCostId.value,
         payment_reference: paymentReference,
         notes: notes.value,
     };
@@ -149,7 +152,7 @@ const editOrder = (order) => {
         qty: i.quantity,
     }));
     discount.value = 0;
-    serviceChargeRate.value = 0;
+    selectedAdditionalCostId.value = null;
     resetCartStateKeepEditing(order);
 };
 
@@ -389,7 +392,7 @@ defineOptions({ layout: AppLayout });
                             <span>Diskon</span><span class="font-semibold">-{{ money(discount) }}</span>
                         </div>
                         <div v-if="serviceCharge > 0" class="flex justify-between text-emerald-600">
-                            <span>Service ({{ serviceChargeRate }}%)</span><span class="font-semibold">{{ money(serviceCharge) }}</span>
+                            <span>{{ selectedAdditionalCost.name }} ({{ serviceChargeRate }}%)</span><span class="font-semibold">{{ money(serviceCharge) }}</span>
                         </div>
                         <div class="flex justify-between text-slate-500">
                             <span>Tax (11%)</span><span class="font-semibold">{{ money(cartTax) }}</span>
@@ -408,8 +411,13 @@ defineOptions({ layout: AppLayout });
                             <input v-model.number="discount" type="number" min="0" class="input" placeholder="0">
                         </div>
                         <div>
-                            <label class="label">Biaya Tambahan / Service (%)</label>
-                            <input v-model.number="serviceChargeRate" type="number" min="0" max="100" class="input" placeholder="0">
+                            <label class="label">Biaya Tambahan</label>
+                            <select v-model="selectedAdditionalCostId" class="input">
+                                <option :value="null">Tanpa biaya tambahan</option>
+                                <option v-for="cost in additionalCosts" :key="cost.id" :value="cost.id">
+                                    {{ cost.name }} ({{ cost.rate }}%)
+                                </option>
+                            </select>
                         </div>
                         <div>
                             <label class="label">Metode Pembayaran</label>

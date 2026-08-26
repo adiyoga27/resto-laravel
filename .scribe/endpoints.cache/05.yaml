@@ -115,13 +115,13 @@ endpoints:
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      service_charge_rate:
+      additional_cost_id:
         custom: []
-        name: service_charge_rate
-        description: 'Service charge percentage (e.g. 5 for 5%).'
+        name: additional_cost_id
+        description: 'ID biaya tambahan dari master data.'
         required: false
-        example: '5'
-        type: numeric
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: true
@@ -202,7 +202,7 @@ endpoints:
       customer_name: 'John Doe'
       customer_phone: '08123456789'
       discount: '5000'
-      service_charge_rate: '5'
+      additional_cost_id: 1
     fileParameters: []
     responses:
       -

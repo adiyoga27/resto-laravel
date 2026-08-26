@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\OrderType;
+use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -59,9 +60,10 @@ test('kasir can store a cash order without cash received and change stays null',
     expect($payment->change)->toBeNull();
 });
 
-test('kasir can store an order with service charge applied to total', function () {
+test('kasir can store an order with additional cost from master data', function () {
     $kasir = User::factory()->kasir()->create();
     $menuItem = MenuItem::factory()->create(['price' => 10000]);
+    $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
 
     $this->actingAs($kasir)
         ->post(route('pos.orders.store'), [
@@ -69,22 +71,24 @@ test('kasir can store an order with service charge applied to total', function (
             'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
             'payment_method' => 'qris',
             'payment_amount' => 23200,
-            'service_charge_rate' => 5,
+            'additional_cost_id' => $cost->id,
             'discount' => 0,
         ])
         ->assertRedirect(route('pos.index'));
 
     $order = Order::where('created_by', $kasir->id)->first();
     expect((float) $order->subtotal)->toBe(20000.0);
-    expect((float) $order->service_charge_rate)->toBe(5.0);
-    expect((float) $order->service_charge)->toBe(1000.0);
+    expect($order->additional_cost_name)->toBe('Service Charge');
+    expect((float) $order->additional_cost_rate)->toBe(5.0);
+    expect((float) $order->additional_cost)->toBe(1000.0);
     expect((float) $order->tax)->toBe(2200.0);
     expect((float) $order->total)->toBe(23200.0);
 });
 
-test('service charge is computed on amount after discount', function () {
+test('additional cost is computed on amount after discount', function () {
     $kasir = User::factory()->kasir()->create();
     $menuItem = MenuItem::factory()->create(['price' => 10000]);
+    $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
 
     $this->actingAs($kasir)
         ->post(route('pos.orders.store'), [
@@ -93,7 +97,7 @@ test('service charge is computed on amount after discount', function () {
             'payment_method' => 'cash',
             'payment_amount' => 20880,
             'cash_received' => 25000,
-            'service_charge_rate' => 5,
+            'additional_cost_id' => $cost->id,
             'discount' => 2000,
         ])
         ->assertRedirect(route('pos.index'));
@@ -101,7 +105,7 @@ test('service charge is computed on amount after discount', function () {
     $order = Order::where('created_by', $kasir->id)->first();
     expect((float) $order->subtotal)->toBe(20000.0);
     expect((float) $order->discount)->toBe(2000.0);
-    expect((float) $order->service_charge)->toBe(900.0);
+    expect((float) $order->additional_cost)->toBe(900.0);
     expect((float) $order->tax)->toBe(1980.0);
     expect((float) $order->total)->toBe(20880.0);
 
@@ -109,7 +113,7 @@ test('service charge is computed on amount after discount', function () {
     expect((float) $payment->change)->toBe(4120.0);
 });
 
-test('receipt includes service charge for orders with service rate', function () {
+test('receipt includes additional cost for orders with additional cost', function () {
     $kasir = User::factory()->kasir()->create();
 
     $order = Order::factory()->create([
@@ -117,8 +121,9 @@ test('receipt includes service charge for orders with service rate', function ()
         'order_type' => OrderType::DineIn,
         'subtotal' => 20000,
         'discount' => 0,
-        'service_charge_rate' => 5,
-        'service_charge' => 1000,
+        'additional_cost_name' => 'Service Charge',
+        'additional_cost_rate' => 5,
+        'additional_cost' => 1000,
         'tax' => 2200,
         'total' => 23200,
     ]);
@@ -126,15 +131,19 @@ test('receipt includes service charge for orders with service rate', function ()
     $this->actingAs($kasir)
         ->getJson(route('pos.orders.receipt', $order))
         ->assertOk()
-        ->assertJsonPath('order.service_charge_rate', 5)
-        ->assertJsonPath('order.service_charge', 1000);
+        ->assertJsonPath('order.additional_cost_rate', 5)
+        ->assertJsonPath('order.additional_cost', 1000);
 });
 
-test('recalculateTotals applies service charge and discount', function () {
+test('recalculateTotals applies additional cost and discount', function () {
+    $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
+
     $order = Order::factory()->create([
         'subtotal' => 0,
         'discount' => 2000,
-        'service_charge_rate' => 5,
+        'additional_cost_id' => $cost->id,
+        'additional_cost_name' => $cost->name,
+        'additional_cost_rate' => 5,
         'tax' => 0,
         'total' => 0,
     ]);
@@ -149,7 +158,7 @@ test('recalculateTotals applies service charge and discount', function () {
     $order->recalculateTotals();
 
     expect((float) $order->subtotal)->toBe(20000.0);
-    expect((float) $order->service_charge)->toBe(900.0);
+    expect((float) $order->additional_cost)->toBe(900.0);
     expect((float) $order->tax)->toBe(1980.0);
     expect((float) $order->total)->toBe(20880.0);
 });
