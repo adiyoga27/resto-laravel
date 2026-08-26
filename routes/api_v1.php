@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdditionalCostController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\MenuController;
 use App\Http\Controllers\Api\V1\OrderController;
@@ -19,6 +20,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('menu', [MenuController::class, 'index']);
     Route::get('menu/{menuItem}', [MenuController::class, 'show']);
+
+    Route::get('additional-costs', [AdditionalCostController::class, 'index']);
 
     Route::get('tables', [TableController::class, 'index']);
     Route::post('tables', [TableController::class, 'store']);

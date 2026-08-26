@@ -62,7 +62,7 @@ endpoints:
         name: menuItem_id
         description: 'The ID of the menuItem.'
         required: true
-        example: 1
+        example: 21
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -80,7 +80,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      menuItem_id: 1
+      menuItem_id: 21
       menuItem: 16
     queryParameters: []
     cleanQueryParameters: []
