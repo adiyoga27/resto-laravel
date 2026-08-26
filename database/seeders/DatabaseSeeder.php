@@ -8,6 +8,7 @@ use App\Models\AdditionalCost;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
 use App\Models\RestaurantTable;
+use App\Models\StoreProfile;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -100,6 +101,13 @@ class DatabaseSeeder extends Seeder
             'rate' => 1,
             'is_active' => true,
             'sort_order' => 2,
+        ]);
+
+        StoreProfile::create([
+            'store_name' => 'Resto Nusantara',
+            'store_address' => 'Jl. Merdeka No. 123, Jakarta',
+            'store_phone' => '021-555-0123',
+            'is_active' => true,
         ]);
     }
 }

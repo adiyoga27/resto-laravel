@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\ReservationController;
+use App\Http\Controllers\Api\V1\StoreProfileController;
 use App\Http\Controllers\Api\V1\SyncController;
 use App\Http\Controllers\Api\V1\TableController;
 use Illuminate\Support\Facades\Route;
@@ -42,4 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('payments/{payment}', [PaymentController::class, 'show']);
 
     Route::post('sync', [SyncController::class, 'sync']);
+
+    Route::middleware('role:admin')->group(function () {
+        Route::get('store-profiles', [StoreProfileController::class, 'index']);
+        Route::post('store-profiles', [StoreProfileController::class, 'store']);
+        Route::put('store-profiles', [StoreProfileController::class, 'update']);
+    });
 });

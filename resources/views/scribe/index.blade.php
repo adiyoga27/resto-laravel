@@ -163,6 +163,22 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-store-profiles" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="store-profiles">
+                    <a href="#store-profiles">Store Profiles</a>
+                </li>
+                                    <ul id="tocify-subheader-store-profiles" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="store-profiles-GETapi-v1-store-profiles">
+                                <a href="#store-profiles-GETapi-v1-store-profiles">Show store profile</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="store-profiles-POSTapi-v1-store-profiles">
+                                <a href="#store-profiles-POSTapi-v1-store-profiles">Create store profile</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="store-profiles-PUTapi-v1-store-profiles">
+                                <a href="#store-profiles-PUTapi-v1-store-profiles">Update store profile</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-sync" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="sync">
                     <a href="#sync">Sync</a>
@@ -2996,6 +3012,552 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Reservation ID. Example: <code>16</code></p>
             </div>
                     </form>
+
+                <h1 id="store-profiles">Store Profiles</h1>
+
+    
+
+                                <h2 id="store-profiles-GETapi-v1-store-profiles">Show store profile</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Get the single store profile (store name, address, phone). Returns <code>404</code>
+when no profile has been created yet. Only accounts with the <code>admin</code> role
+can access this endpoint.</p>
+
+<span id="example-requests-GETapi-v1-store-profiles">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "https://shadja.my.id/api/v1/store-profiles" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://shadja.my.id/api/v1/store-profiles"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-store-profiles">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;store_name&quot;: &quot;Resto Nusantara&quot;,
+    &quot;store_address&quot;: &quot;Jl. Merdeka No. 123, Jakarta&quot;,
+    &quot;store_phone&quot;: &quot;021-555-0123&quot;,
+    &quot;is_active&quot;: true
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Store profile not found.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-store-profiles" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-store-profiles"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-store-profiles"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-store-profiles" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-store-profiles">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-store-profiles" data-method="GET"
+      data-path="api/v1/store-profiles"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-store-profiles', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-store-profiles"
+                    onclick="tryItOut('GETapi-v1-store-profiles');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-store-profiles"
+                    onclick="cancelTryOut('GETapi-v1-store-profiles');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-store-profiles"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/store-profiles</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="store-profiles-POSTapi-v1-store-profiles">Create store profile</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Create the single store profile. Returns <code>409 Conflict</code> if a profile has
+already been created (use PUT to update it instead).</p>
+
+<span id="example-requests-POSTapi-v1-store-profiles">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "https://shadja.my.id/api/v1/store-profiles" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"store_name\": \"Resto Nusantara\",
+    \"store_address\": \"Jl. Merdeka No. 123, Jakarta\",
+    \"store_phone\": \"021-555-0123\",
+    \"is_active\": false
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://shadja.my.id/api/v1/store-profiles"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "store_name": "Resto Nusantara",
+    "store_address": "Jl. Merdeka No. 123, Jakarta",
+    "store_phone": "021-555-0123",
+    "is_active": false
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-store-profiles">
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;store_name&quot;: &quot;Resto Nusantara&quot;,
+    &quot;store_address&quot;: &quot;Jl. Merdeka No. 123, Jakarta&quot;,
+    &quot;store_phone&quot;: &quot;021-555-0123&quot;,
+    &quot;is_active&quot;: true
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Store profile already exists.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-store-profiles" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-store-profiles"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-store-profiles"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-store-profiles" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-store-profiles">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-store-profiles" data-method="POST"
+      data-path="api/v1/store-profiles"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-store-profiles', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-store-profiles"
+                    onclick="tryItOut('POSTapi-v1-store-profiles');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-store-profiles"
+                    onclick="cancelTryOut('POSTapi-v1-store-profiles');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-store-profiles"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/store-profiles</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_name"                data-endpoint="POSTapi-v1-store-profiles"
+               value="Resto Nusantara"
+               data-component="body">
+    <br>
+<p>Store name. Example: <code>Resto Nusantara</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_address"                data-endpoint="POSTapi-v1-store-profiles"
+               value="Jl. Merdeka No. 123, Jakarta"
+               data-component="body">
+    <br>
+<p>Store address. Example: <code>Jl. Merdeka No. 123, Jakarta</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_phone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_phone"                data-endpoint="POSTapi-v1-store-profiles"
+               value="021-555-0123"
+               data-component="body">
+    <br>
+<p>Store phone number. Example: <code>021-555-0123</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-v1-store-profiles" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="POSTapi-v1-store-profiles"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-v1-store-profiles" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="POSTapi-v1-store-profiles"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Set profile as active. Default: true Example: <code>false</code></p>
+        </div>
+        </form>
+
+                    <h2 id="store-profiles-PUTapi-v1-store-profiles">Update store profile</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Update the single store profile. Creates the profile if it does not exist yet.</p>
+
+<span id="example-requests-PUTapi-v1-store-profiles">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PUT \
+    "https://shadja.my.id/api/v1/store-profiles" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"store_name\": \"Resto Nusantara 2\",
+    \"store_address\": \"Jl. Sudirman No. 90, Jakarta\",
+    \"store_phone\": \"021-555-0456\",
+    \"is_active\": true
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "https://shadja.my.id/api/v1/store-profiles"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "store_name": "Resto Nusantara 2",
+    "store_address": "Jl. Sudirman No. 90, Jakarta",
+    "store_phone": "021-555-0456",
+    "is_active": true
+};
+
+fetch(url, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-PUTapi-v1-store-profiles">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: 1,
+    &quot;store_name&quot;: &quot;Resto Nusantara 2&quot;,
+    &quot;store_address&quot;: &quot;Jl. Sudirman No. 90, Jakarta&quot;,
+    &quot;store_phone&quot;: &quot;021-555-0456&quot;,
+    &quot;is_active&quot;: true
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-PUTapi-v1-store-profiles" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PUTapi-v1-store-profiles"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PUTapi-v1-store-profiles"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PUTapi-v1-store-profiles" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PUTapi-v1-store-profiles">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PUTapi-v1-store-profiles" data-method="PUT"
+      data-path="api/v1/store-profiles"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-store-profiles', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PUTapi-v1-store-profiles"
+                    onclick="tryItOut('PUTapi-v1-store-profiles');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PUTapi-v1-store-profiles"
+                    onclick="cancelTryOut('PUTapi-v1-store-profiles');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PUTapi-v1-store-profiles"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-darkblue">PUT</small>
+            <b><code>api/v1/store-profiles</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PUTapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PUTapi-v1-store-profiles"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_name"                data-endpoint="PUTapi-v1-store-profiles"
+               value="Resto Nusantara 2"
+               data-component="body">
+    <br>
+<p>Store name. Example: <code>Resto Nusantara 2</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_address</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_address"                data-endpoint="PUTapi-v1-store-profiles"
+               value="Jl. Sudirman No. 90, Jakarta"
+               data-component="body">
+    <br>
+<p>Store address. Example: <code>Jl. Sudirman No. 90, Jakarta</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>store_phone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="store_phone"                data-endpoint="PUTapi-v1-store-profiles"
+               value="021-555-0456"
+               data-component="body">
+    <br>
+<p>Store phone number. Example: <code>021-555-0456</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PUTapi-v1-store-profiles" style="display: none">
+            <input type="radio" name="is_active"
+                   value="true"
+                   data-endpoint="PUTapi-v1-store-profiles"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PUTapi-v1-store-profiles" style="display: none">
+            <input type="radio" name="is_active"
+                   value="false"
+                   data-endpoint="PUTapi-v1-store-profiles"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Set profile as active. Example: <code>true</code></p>
+        </div>
+        </form>
 
                 <h1 id="sync">Sync</h1>
 

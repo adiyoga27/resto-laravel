@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\RecipeController;
 use App\Http\Controllers\Admin\StockLogController;
 use App\Http\Controllers\Admin\StockOpnameController;
+use App\Http\Controllers\Admin\StoreProfileController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -46,6 +47,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('menu-items', MenuItemController::class);
         Route::resource('tables', TableController::class);
         Route::resource('additional-costs', AdditionalCostController::class);
+        Route::get('/store-profiles', [StoreProfileController::class, 'index'])->name('store-profiles.index');
+        Route::post('/store-profiles', [StoreProfileController::class, 'store'])->name('store-profiles.store');
+        Route::put('/store-profiles', [StoreProfileController::class, 'update'])->name('store-profiles.update');
         Route::resource('ingredients', IngredientController::class);
         Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
         Route::post('/recipes', [RecipeController::class, 'store'])->name('recipes.store');

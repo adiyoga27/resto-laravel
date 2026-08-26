@@ -25,6 +25,7 @@ const routeTitles = {
     'admin.additional-costs.index': 'Biaya Tambahan',
     'admin.additional-costs.create': 'Tambah Biaya Tambahan',
     'admin.additional-costs.edit': 'Edit Biaya Tambahan',
+    'admin.store-profiles.index': 'Data Toko',
     'admin.ingredients.index': 'Bahan Baku',
     'admin.ingredients.create': 'Tambah Bahan',
     'admin.ingredients.edit': 'Edit Bahan',
@@ -65,6 +66,7 @@ const navGroups = computed(() => {
             { name: 'Menu Items', href: route('admin.menu-items.index'), icon: 'M3 7l9-4 9 4-9 4-9-4zM3 7v6l9 4 9-4V7M3 13v6l9 4 9-4v-6', activeRoutes: ['admin.menu-items'] },
             { name: 'Meja', href: route('admin.tables.index'), icon: 'M4 6h16M4 12h16M4 18h16M8 6v12M16 6v12', activeRoutes: ['admin.tables'] },
             { name: 'Biaya Tambahan', href: route('admin.additional-costs.index'), icon: 'M12 8c-1.5 0-3 .5-3 1.5S10.5 11 12 11s3 .5 3 1.5-1.5 1.5-3 1.5-3 .5-3 1.5S10.5 17 12 17m0-9v1m0 6v1m0 2a9 9 0 110-18 9 9 0 010 18zm-3-11a3 3 0 116 0m-6 5a2 2 0 11 4 0m-2 6a9 9 0 01-9-9', activeRoutes: ['admin.additional-costs'] },
+            { name: 'Data Toko', href: route('admin.store-profiles.index'), icon: 'M12 8c-1.5 0-3 .5-3 1.5S10.5 11 12 11s3 .5 3 1.5-1.5 1.5-3 1.5-3 .5-3 1.5S10.5 17 12 17m0-9v1m0 6v1m0 2a9 9 0 110-18 9 9 0 010 18zm-3-11a3 3 0 116 0m-6 5a2 2 0 11 4 0m-2 6a9 9 0 01-9-9', activeRoutes: ['admin.store-profiles'] },
         );
         stock.push(
             { name: 'Bahan Baku', href: route('admin.ingredients.index'), icon: 'M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16zM3.3 7.7L12 12.7l8.7-5M12 22V12', activeRoutes: ['admin.ingredients'] },
