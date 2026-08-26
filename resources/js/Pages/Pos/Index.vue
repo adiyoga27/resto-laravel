@@ -58,7 +58,7 @@ const addToCart = (item) => {
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.value.push({ id: item.id, name: item.name, price: Number(item.price), qty: 1 });
+        cart.value.push({ id: item.id, name: item.name, price: Number(item.price), qty: 1, notes: '' });
     }
 };
 
@@ -149,6 +149,7 @@ const editOrder = (order) => {
         name: i.menu_item?.name ?? 'Menu',
         price: Number(i.price),
         qty: i.quantity,
+        notes: i.notes ?? '',
     }));
     discount.value = 0;
     selectedAdditionalCostId.value = null;
@@ -374,6 +375,12 @@ defineOptions({ layout: AppLayout });
                             </div>
                             <button class="text-xs font-medium text-rose-500 transition hover:text-rose-600" @click="removeItem(index)">Hapus</button>
                         </div>
+                        <input
+                            v-model="item.notes"
+                            type="text"
+                            class="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none"
+                            placeholder="Catatan item (opsional)"
+                        >
                     </div>
                     <div v-if="!cart.length" class="flex h-full flex-col items-center justify-center py-16 text-slate-300">
                         <p class="text-5xl">🛍️</p>
