@@ -1034,7 +1034,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"delivery_address\": \"Jl. Merdeka No. 10\",
     \"customer_name\": \"John Doe\",
     \"customer_phone\": \"08123456789\",
-    \"discount\": \"5000\"
+    \"discount\": \"5000\",
+    \"service_charge_rate\": \"5\"
 }"
 </code></pre></div>
 
@@ -1059,7 +1060,8 @@ let body = {
     "delivery_address": "Jl. Merdeka No. 10",
     "customer_name": "John Doe",
     "customer_phone": "08123456789",
-    "discount": "5000"
+    "discount": "5000",
+    "service_charge_rate": "5"
 };
 
 fetch(url, {
@@ -1355,6 +1357,18 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Discount amount. Example: <code>5000</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>service_charge_rate</code></b>&nbsp;&nbsp;
+<small>numeric</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="service_charge_rate"                data-endpoint="POSTapi-v1-orders"
+               value="5"
+               data-component="body">
+    <br>
+<p>Service charge percentage (e.g. 5 for 5%). Example: <code>5</code></p>
         </div>
         </form>
 
@@ -3015,10 +3029,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="actions.0.action_type"                data-endpoint="POSTapi-v1-sync"
-               value="reservation"
+               value="order"
                data-component="body">
     <br>
-<p>Example: <code>reservation</code></p>
+<p>Example: <code>order</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>order</code></li> <li><code>reservation</code></li></ul>
                     </div>

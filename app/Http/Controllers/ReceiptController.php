@@ -28,6 +28,8 @@ class ReceiptController extends Controller
                 'customer_phone' => $order->customer_phone,
                 'subtotal' => (float) $order->subtotal,
                 'discount' => (float) $order->discount,
+                'service_charge_rate' => $order->service_charge_rate !== null ? (float) $order->service_charge_rate : null,
+                'service_charge' => $order->service_charge !== null ? (float) $order->service_charge : 0,
                 'tax' => (float) $order->tax,
                 'total' => (float) $order->total,
                 'notes' => $order->notes,

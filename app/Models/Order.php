@@ -18,7 +18,7 @@ class Order extends Model
     protected $fillable = [
         'order_number', 'customer_id', 'restaurant_table_id', 'created_by',
         'channel', 'order_type', 'order_status', 'is_posted_to_cash_flow',
-        'subtotal', 'discount', 'tax', 'total',
+        'subtotal', 'discount', 'service_charge_rate', 'service_charge', 'tax', 'total',
         'notes', 'delivery_address', 'customer_name', 'customer_phone',
     ];
 
@@ -31,6 +31,8 @@ class Order extends Model
             'is_posted_to_cash_flow' => 'boolean',
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
+            'service_charge_rate' => 'decimal:2',
+            'service_charge' => 'decimal:2',
             'tax' => 'decimal:2',
             'total' => 'decimal:2',
         ];
@@ -83,8 +85,10 @@ class Order extends Model
     public function recalculateTotals(): void
     {
         $this->subtotal = $this->orderItems->sum('subtotal');
-        $this->tax = $this->subtotal * 0.11;
-        $this->total = $this->subtotal + $this->tax;
+        $afterDiscount = max(0, $this->subtotal - $this->discount);
+        $this->service_charge = $this->service_charge_rate ? round($afterDiscount * ($this->service_charge_rate / 100), 2) : 0;
+        $this->tax = $afterDiscount * 0.11;
+        $this->total = $afterDiscount + $this->tax + $this->service_charge;
         $this->save();
     }
 

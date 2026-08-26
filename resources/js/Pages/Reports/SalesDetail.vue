@@ -115,6 +115,10 @@ defineOptions({ layout: AppLayout });
                                     <th colspan="4" class="px-6 py-3 text-right text-sm text-slate-500">Tax (11%)</th>
                                     <th class="px-6 py-3 text-right text-sm font-semibold">{{ money(order.tax) }}</th>
                                 </tr>
+                                <tr v-if="order.service_charge_rate > 0">
+                                    <th colspan="4" class="px-6 py-3 text-right text-sm text-emerald-600">Service ({{ order.service_charge_rate }}%)</th>
+                                    <th class="px-6 py-3 text-right text-sm font-semibold text-emerald-600">{{ money(order.service_charge) }}</th>
+                                </tr>
                                 <tr>
                                     <th colspan="4" class="px-6 py-3 text-right text-sm font-bold text-slate-900">Total</th>
                                     <th class="px-6 py-3 text-right text-base font-extrabold text-indigo-600">{{ money(order.total) }}</th>

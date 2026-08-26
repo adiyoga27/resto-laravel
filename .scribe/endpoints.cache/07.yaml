@@ -65,7 +65,7 @@ endpoints:
         name: 'actions[].action_type'
         description: ''
         required: true
-        example: reservation
+        example: order
         type: string
         enumValues:
           - order

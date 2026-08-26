@@ -76,6 +76,7 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
+            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -87,6 +88,7 @@ class PosController extends Controller
         }
 
         $discount = (float) ($validated['discount'] ?? 0);
+        $serviceChargeRate = (float) ($validated['service_charge_rate'] ?? 0);
 
         $order = Order::create([
             'customer_name' => $validated['customer_name'] ?? null,
@@ -98,6 +100,8 @@ class PosController extends Controller
             'order_status' => OrderStatus::Baru,
             'subtotal' => 0,
             'discount' => $discount,
+            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
+            'service_charge' => 0,
             'tax' => 0,
             'total' => 0,
             'notes' => $validated['notes'] ?? null,
@@ -122,11 +126,14 @@ class PosController extends Controller
         }
 
         $afterDiscount = max(0, $subtotal - $discount);
+        $serviceCharge = $serviceChargeRate > 0 ? round($afterDiscount * ($serviceChargeRate / 100), 2) : 0;
         $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax;
+        $total = $afterDiscount + $tax + $serviceCharge;
 
         $order->update([
             'subtotal' => $subtotal,
+            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
+            'service_charge' => $serviceCharge,
             'tax' => $tax,
             'total' => $total,
         ]);
@@ -175,10 +182,12 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
+            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
         $discount = (float) ($validated['discount'] ?? 0);
+        $serviceChargeRate = (float) ($validated['service_charge_rate'] ?? 0);
 
         $order->orderItems()->delete();
 
@@ -201,14 +210,17 @@ class PosController extends Controller
         }
 
         $afterDiscount = max(0, $subtotal - $discount);
+        $serviceCharge = $serviceChargeRate > 0 ? round($afterDiscount * ($serviceChargeRate / 100), 2) : 0;
         $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax;
+        $total = $afterDiscount + $tax + $serviceCharge;
 
         $order->update([
             'customer_name' => $validated['customer_name'] ?? $order->customer_name,
             'customer_phone' => $validated['customer_phone'] ?? $order->customer_phone,
             'subtotal' => $subtotal,
             'discount' => $discount,
+            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
+            'service_charge' => $serviceCharge,
             'tax' => $tax,
             'total' => $total,
             'notes' => $validated['notes'] ?? $order->notes,

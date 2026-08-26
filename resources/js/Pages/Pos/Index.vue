@@ -17,6 +17,7 @@ const cart = ref([]);
 const selectedOrderType = ref('dine-in');
 const selectedTable = ref(null);
 const discount = ref(0);
+const serviceChargeRate = ref(0);
 const editingOrderId = ref(null);
 const search = ref('');
 const customerName = ref('');
@@ -41,8 +42,9 @@ const filteredCategories = computed(() => {
 
 const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + item.price * item.qty, 0));
 const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.value || 0)));
+const serviceCharge = computed(() => (serviceChargeRate.value > 0 ? Math.round(afterDiscount.value * (serviceChargeRate.value / 100) * 100) / 100 : 0));
 const cartTax = computed(() => afterDiscount.value * 0.11);
-const cartTotal = computed(() => afterDiscount.value + cartTax.value);
+const cartTotal = computed(() => afterDiscount.value + cartTax.value + serviceCharge.value);
 const cashChange = computed(() => (paymentMethod.value === 'cash' && cashReceived.value !== null ? Math.max(0, Number(cashReceived.value) - cartTotal.value) : 0));
 const cartCount = computed(() => cart.value.reduce((sum, item) => sum + item.qty, 0));
 const cartTitle = computed(() => (editingOrderId.value ? 'Edit Pesanan' : 'Pesanan Baru'));
@@ -85,6 +87,7 @@ const resetCart = () => {
     selectedOrderType.value = 'dine-in';
     selectedTable.value = null;
     discount.value = 0;
+    serviceChargeRate.value = 0;
     editingOrderId.value = null;
     customerName.value = '';
     customerPhone.value = '';
@@ -125,6 +128,7 @@ const submitOrder = () => {
         payment_amount: cartTotal.value,
         cash_received: cashReceived.value,
         discount: discount.value,
+        service_charge_rate: serviceChargeRate.value,
         payment_reference: paymentReference,
         notes: notes.value,
     };
@@ -145,6 +149,7 @@ const editOrder = (order) => {
         qty: i.quantity,
     }));
     discount.value = 0;
+    serviceChargeRate.value = 0;
     resetCartStateKeepEditing(order);
 };
 
@@ -383,6 +388,9 @@ defineOptions({ layout: AppLayout });
                         <div v-if="discount > 0" class="flex justify-between text-rose-500">
                             <span>Diskon</span><span class="font-semibold">-{{ money(discount) }}</span>
                         </div>
+                        <div v-if="serviceCharge > 0" class="flex justify-between text-emerald-600">
+                            <span>Service ({{ serviceChargeRate }}%)</span><span class="font-semibold">{{ money(serviceCharge) }}</span>
+                        </div>
                         <div class="flex justify-between text-slate-500">
                             <span>Tax (11%)</span><span class="font-semibold">{{ money(cartTax) }}</span>
                         </div>
@@ -398,6 +406,10 @@ defineOptions({ layout: AppLayout });
                         <div>
                             <label class="label">Diskon (Rp)</label>
                             <input v-model.number="discount" type="number" min="0" class="input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="label">Biaya Tambahan / Service (%)</label>
+                            <input v-model.number="serviceChargeRate" type="number" min="0" max="100" class="input" placeholder="0">
                         </div>
                         <div>
                             <label class="label">Metode Pembayaran</label>

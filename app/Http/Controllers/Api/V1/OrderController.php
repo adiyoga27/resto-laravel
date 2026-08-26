@@ -52,6 +52,7 @@ class OrderController extends Controller
      * @bodyParam customer_phone string Optional customer phone number. Example: 08123456789
      * @bodyParam delivery_address string required if order_type=delivery. Example: Jl. Merdeka No. 10
      * @bodyParam discount numeric Discount amount. Example: 5000
+     * @bodyParam service_charge_rate numeric Service charge percentage (e.g. 5 for 5%). Example: 5
      * @bodyParam notes string Optional order notes.
      *
      * @response 201 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":5000,"tax":4950,"total":49950,"customer_name":"John Doe","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}]}
@@ -70,6 +71,7 @@ class OrderController extends Controller
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['nullable', 'string', 'max:20'],
             'discount' => ['nullable', 'numeric', 'min:0'],
+            'service_charge_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
         if ($validated['order_type'] === 'dine-in') {
@@ -80,6 +82,7 @@ class OrderController extends Controller
         }
 
         $discount = (float) ($validated['discount'] ?? 0);
+        $serviceChargeRate = (float) ($validated['service_charge_rate'] ?? 0);
 
         $order = Order::create([
             'customer_id' => auth()->id(),
@@ -89,6 +92,8 @@ class OrderController extends Controller
             'order_status' => OrderStatus::Baru,
             'subtotal' => 0,
             'discount' => $discount,
+            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
+            'service_charge' => 0,
             'tax' => 0,
             'total' => 0,
             'notes' => $validated['notes'] ?? null,
@@ -116,11 +121,14 @@ class OrderController extends Controller
         }
 
         $afterDiscount = max(0, $subtotal - $discount);
+        $serviceCharge = $serviceChargeRate > 0 ? round($afterDiscount * ($serviceChargeRate / 100), 2) : 0;
         $tax = $afterDiscount * 0.11;
-        $total = $afterDiscount + $tax;
+        $total = $afterDiscount + $tax + $serviceCharge;
 
         $order->update([
             'subtotal' => $subtotal,
+            'service_charge_rate' => $serviceChargeRate > 0 ? $serviceChargeRate : null,
+            'service_charge' => $serviceCharge,
             'tax' => $tax,
             'total' => $total,
         ]);
