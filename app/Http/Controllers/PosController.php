@@ -37,8 +37,7 @@ class PosController extends Controller
             ->orderBy('table_number')
             ->get();
 
-        $activeOrders = Order::with(['orderItems.menuItem', 'restaurantTable', 'payments'])
-            ->where('created_by', auth()->id())
+        $activeOrders = Order::with(['orderItems.menuItem', 'restaurantTable', 'payments', 'createdBy'])
             ->whereIn('order_status', ['baru', 'diproses', 'siap'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -168,7 +167,7 @@ class PosController extends Controller
 
     public function update(Request $request, Order $order): RedirectResponse
     {
-        if ($order->created_by !== auth()->id() || ! in_array($order->order_status->value, ['baru', 'diproses', 'siap'])) {
+        if (! in_array($order->order_status->value, ['baru', 'diproses', 'siap'])) {
             abort(403);
         }
 
@@ -258,8 +257,7 @@ class PosController extends Controller
 
     public function getActiveOrders(): JsonResponse
     {
-        $orders = Order::with(['orderItems.menuItem', 'restaurantTable', 'payments'])
-            ->where('created_by', auth()->id())
+        $orders = Order::with(['orderItems.menuItem', 'restaurantTable', 'payments', 'createdBy'])
             ->whereIn('order_status', ['baru', 'diproses', 'siap'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -269,10 +267,6 @@ class PosController extends Controller
 
     public function completeOrder(Order $order): RedirectResponse
     {
-        if ($order->created_by && $order->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
-            abort(403);
-        }
-
         if ($order->order_status !== OrderStatus::Selesai) {
             $order->update(['order_status' => OrderStatus::Selesai]);
             $order->mutateStock();
@@ -287,10 +281,6 @@ class PosController extends Controller
 
     public function cancelOrder(Order $order): RedirectResponse
     {
-        if ($order->created_by && $order->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
-            abort(403);
-        }
-
         $order->update(['order_status' => OrderStatus::Dibatalkan]);
 
         if ($order->restaurant_table_id) {

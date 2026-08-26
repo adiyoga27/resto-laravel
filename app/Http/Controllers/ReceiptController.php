@@ -9,10 +9,6 @@ class ReceiptController extends Controller
 {
     public function show(Order $order): JsonResponse
     {
-        if ($order->created_by && $order->created_by !== auth()->id() && ! auth()->user()->isAdmin()) {
-            abort(403);
-        }
-
         $order->load(['orderItems.menuItem', 'restaurantTable', 'payments', 'createdBy']);
 
         return response()->json([

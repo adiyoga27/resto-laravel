@@ -45,6 +45,40 @@ class Order extends Model
                 $order->order_number = 'ORD-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
             }
         });
+
+        static::updated(function (Order $order) {
+            if (! $order->isDirty('order_status')) {
+                return;
+            }
+
+            OrderStatusLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->id(),
+                'from_status' => $order->getOriginal('order_status'),
+                'to_status' => $order->order_status->value,
+                'source' => self::logSource(),
+            ]);
+        });
+    }
+
+    private static function logSource(): string
+    {
+        $route = request()->route();
+
+        if (! $route) {
+            return 'system';
+        }
+
+        if (str_starts_with($route->uri(), 'api/')) {
+            return 'mobile';
+        }
+
+        return match ($route->getName()) {
+            'pos.orders.complete', 'pos.orders.cancel', 'pos.orders.update' => 'pos',
+            'kitchen.orders.status' => 'kitchen',
+            'reports.sales.update' => 'report',
+            default => 'system',
+        };
     }
 
     public function restaurantTable(): BelongsTo

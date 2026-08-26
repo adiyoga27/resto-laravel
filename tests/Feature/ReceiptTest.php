@@ -36,7 +36,7 @@ test('kasir can view receipt of own order', function () {
         ->assertJsonCount(1, 'order.payments');
 });
 
-test('kasir cannot view receipt of other kasir order', function () {
+test('kasir can view receipt of other kasir order and cashier is noted', function () {
     $kasir = User::factory()->kasir()->create();
     $other = User::factory()->kasir()->create();
 
@@ -44,7 +44,9 @@ test('kasir cannot view receipt of other kasir order', function () {
 
     $this->actingAs($kasir)
         ->getJson(route('pos.orders.receipt', $order))
-        ->assertForbidden();
+        ->assertOk()
+        ->assertJsonPath('order.number', $order->order_number)
+        ->assertJsonPath('order.cashier', $other->name);
 });
 
 test('admin can view receipt of any order', function () {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\MenuCategoryController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\OrderLogController;
 use App\Http\Controllers\Admin\RecipeController;
 use App\Http\Controllers\Admin\StockLogController;
 use App\Http\Controllers\Admin\StockOpnameController;
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/stock-logs/production', [StockLogController::class, 'storeProduction'])->name('stock-logs.store-production');
         Route::get('/stock-opnames', [StockOpnameController::class, 'index'])->name('stock-opnames.index');
         Route::get('/stock-opnames/create', [StockOpnameController::class, 'create'])->name('stock-opnames.create');
+        Route::get('/order-logs', [OrderLogController::class, 'index'])->name('order-logs.index');
         Route::post('/stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
         Route::get('/stock-opnames/{stockOpname}', [StockOpnameController::class, 'show'])->name('stock-opnames.show');
         Route::post('/stock-opnames/{stockOpname}/post', [StockOpnameController::class, 'post'])->name('stock-opnames.post');

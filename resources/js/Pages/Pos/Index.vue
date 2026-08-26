@@ -340,6 +340,7 @@ defineOptions({ layout: AppLayout });
                                 · {{ order.order_items.reduce((s, i) => s + i.quantity, 0) }} item
                                 · <span class="font-semibold text-indigo-600">{{ money(order.total) }}</span>
                             </p>
+                            <p class="text-[11px] text-slate-400">oleh {{ order.created_by?.name ?? '-' }}</p>
                         </div>
                         <div class="flex shrink-0 gap-1">
                             <button class="rounded-lg bg-indigo-50 px-2.5 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100" @click="editOrder(order)">Lanjutkan</button>
