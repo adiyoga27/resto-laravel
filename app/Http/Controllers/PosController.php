@@ -115,13 +115,14 @@ class PosController extends Controller
 
         foreach ($validated['items'] as $item) {
             $menuItem = MenuItem::findOrFail($item['menu_item_id']);
-            $itemSubtotal = $menuItem->price * $item['quantity'];
+            $unitPrice = $menuItem->priceForOrderType($validated['order_type']);
+            $itemSubtotal = $unitPrice * $item['quantity'];
 
             OrderItem::create([
                 'order_id' => $order->id,
                 'menu_item_id' => $menuItem->id,
                 'quantity' => $item['quantity'],
-                'price' => $menuItem->price,
+                'price' => $unitPrice,
                 'subtotal' => $itemSubtotal,
                 'notes' => $item['notes'] ?? null,
             ]);
@@ -201,13 +202,14 @@ class PosController extends Controller
 
         foreach ($validated['items'] as $item) {
             $menuItem = MenuItem::findOrFail($item['menu_item_id']);
-            $itemSubtotal = $menuItem->price * $item['quantity'];
+            $unitPrice = $menuItem->priceForOrderType($validated['order_type']);
+            $itemSubtotal = $unitPrice * $item['quantity'];
 
             OrderItem::create([
                 'order_id' => $order->id,
                 'menu_item_id' => $menuItem->id,
                 'quantity' => $item['quantity'],
-                'price' => $menuItem->price,
+                'price' => $unitPrice,
                 'subtotal' => $itemSubtotal,
                 'notes' => $item['notes'] ?? null,
             ]);

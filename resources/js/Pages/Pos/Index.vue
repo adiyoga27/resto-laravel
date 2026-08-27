@@ -41,7 +41,7 @@ const filteredCategories = computed(() => {
     return results;
 });
 
-const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + item.price * item.qty, 0));
+const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + cartItemPrice(item) * item.qty, 0));
 const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.value || 0)));
 const selectedAdditionalCost = computed(() => props.additionalCosts.find((c) => c.id === selectedAdditionalCostId.value));
 const serviceChargeRate = computed(() => (selectedAdditionalCost.value ? Number(selectedAdditionalCost.value.rate) : 0));
@@ -53,12 +53,22 @@ const cartTitle = computed(() => (editingOrderId.value ? 'Edit Pesanan' : 'Pesan
 const activeTables = computed(() => props.tables.filter((t) => t.status === 'kosong'));
 const occupiedTables = computed(() => props.tables.filter((t) => t.status !== 'kosong'));
 
+const menuPrice = (item) => {
+    const price = Number(item.price);
+    return selectedOrderType.value === 'pickup' && item.takeaway_price != null ? Number(item.takeaway_price) : price;
+};
+
+const cartItemPrice = (item) => {
+    const price = Number(item.price);
+    return selectedOrderType.value === 'pickup' && item.takeaway_price != null ? Number(item.takeaway_price) : price;
+};
+
 const addToCart = (item) => {
     const existing = cart.value.find((i) => i.id === item.id);
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.value.push({ id: item.id, name: item.name, price: Number(item.price), qty: 1, notes: '' });
+        cart.value.push({ id: item.id, name: item.name, price: Number(item.price), takeaway_price: item.takeaway_price != null ? Number(item.takeaway_price) : null, qty: 1, notes: '' });
     }
 };
 
@@ -148,6 +158,7 @@ const editOrder = (order) => {
         id: i.menu_item_id,
         name: i.menu_item?.name ?? 'Menu',
         price: Number(i.price),
+        takeaway_price: i.menu_item?.takeaway_price != null ? Number(i.menu_item.takeaway_price) : null,
         qty: i.quantity,
         notes: i.notes ?? '',
     }));
@@ -310,7 +321,7 @@ defineOptions({ layout: AppLayout });
                                 </div>
                                 <div class="p-3">
                                     <p class="truncate text-sm font-bold text-slate-800">{{ item.name }}</p>
-                                    <span class="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-bold text-indigo-600">{{ money(item.price) }}</span>
+                                    <span class="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-bold text-indigo-600">{{ money(menuPrice(item)) }}</span>
                                 </div>
                             </button>
                         </div>
@@ -366,7 +377,7 @@ defineOptions({ layout: AppLayout });
                     <div v-for="(item, index) in cart" :key="index" class="rounded-xl border border-slate-100 p-3">
                         <div class="mb-2 flex items-start justify-between">
                             <p class="text-sm font-semibold text-slate-800">{{ item.name }}</p>
-                            <p class="text-sm font-bold text-indigo-600">{{ money(item.price * item.qty) }}</p>
+                            <p class="text-sm font-bold text-indigo-600">{{ money(cartItemPrice(item) * item.qty) }}</p>
                         </div>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2.5">

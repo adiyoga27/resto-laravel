@@ -14,6 +14,7 @@ const form = useForm({
     name: '',
     description: '',
     price: '',
+    takeaway_price: '',
     stock: 0,
     sort_order: 0,
     image: null,
@@ -54,6 +55,9 @@ defineOptions({ layout: AppLayout });
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <FormGroup name="price" label="Harga (Rp)" :error="form.errors.price" required>
                     <input v-model="form.price" type="number" name="price" min="0" step="0.01" class="input">
+                </FormGroup>
+                <FormGroup name="takeaway_price" label="Harga Take Away (Rp)" :error="form.errors.takeaway_price" hint="Kosongkan jika sama dengan harga reguler">
+                    <input v-model="form.takeaway_price" type="number" name="takeaway_price" min="0" step="0.01" class="input">
                 </FormGroup>
                 <FormGroup name="stock" label="Stok" :error="form.errors.stock">
                     <input v-model.number="form.stock" type="number" name="stock" min="0" class="input">

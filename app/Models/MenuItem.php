@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['menu_category_id', 'name', 'description', 'price', 'image', 'stock', 'is_active', 'sort_order'])]
+#[Fillable(['menu_category_id', 'name', 'description', 'price', 'takeaway_price', 'image', 'stock', 'is_active', 'sort_order'])]
 class MenuItem extends Model
 {
     use HasFactory;
@@ -17,6 +17,7 @@ class MenuItem extends Model
     {
         return [
             'price' => 'decimal:2',
+            'takeaway_price' => 'decimal:2',
             'stock' => 'integer',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
@@ -46,5 +47,14 @@ class MenuItem extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function priceForOrderType(string $orderType): float
+    {
+        if ($orderType === 'pickup' && $this->takeaway_price !== null) {
+            return (float) $this->takeaway_price;
+        }
+
+        return (float) $this->price;
     }
 }

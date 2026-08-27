@@ -91,12 +91,13 @@ defineOptions({ layout: AppLayout });
 
         <div class="card overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[720px] text-left">
+                <table class="w-full min-w-[820px] text-left">
                     <thead class="border-b border-slate-200 bg-slate-50">
                         <tr>
                             <th class="table-th">Menu</th>
                             <th class="table-th">Kategori</th>
                             <th class="table-th">Harga</th>
+                            <th class="table-th">Harga Take Away</th>
                             <th class="table-th">Stok</th>
                             <th class="table-th">Status</th>
                             <th class="table-th text-right">Aksi</th>
@@ -123,6 +124,12 @@ defineOptions({ layout: AppLayout });
                             </td>
                             <td class="table-td font-semibold text-slate-800">{{ money(item.price) }}</td>
                             <td class="table-td">
+                                <template v-if="item.takeaway_price != null">
+                                    <span class="badge bg-amber-50 text-amber-700">{{ money(item.takeaway_price) }}</span>
+                                </template>
+                                <span v-else class="text-slate-300">—</span>
+                            </td>
+                            <td class="table-td">
                                 <span class="badge" :class="item.stock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'">
                                     {{ item.stock }}
                                 </span>
@@ -144,7 +151,7 @@ defineOptions({ layout: AppLayout });
                             </td>
                         </tr>
                         <tr v-if="!menuItems.data.length">
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="7" class="px-6 py-16 text-center">
                                 <p class="text-4xl">🍽️</p>
                                 <p class="mt-2 font-medium text-slate-500">Belum ada menu</p>
                             </td>
