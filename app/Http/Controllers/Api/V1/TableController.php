@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\TableStatus;
 use App\Http\Controllers\Controller;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -56,6 +57,8 @@ class TableController extends Controller
         $validated['status'] = TableStatus::Kosong;
         $table = RestaurantTable::create($validated);
 
+        ActivityLogger::log('table.created', 'Membuat meja "'.$table->table_number.'" (mobile)', $table);
+
         return response()->json($table, 201);
     }
 
@@ -100,6 +103,8 @@ class TableController extends Controller
 
         $table->update($validated);
 
+        ActivityLogger::log('table.updated', 'Mengupdate meja "'.$table->table_number.'" (mobile)', $table);
+
         return response()->json($table);
     }
 
@@ -116,7 +121,10 @@ class TableController extends Controller
      */
     public function destroy(RestaurantTable $table): JsonResponse
     {
+        $number = $table->table_number;
         $table->delete();
+
+        ActivityLogger::log('table.deleted', 'Menghapus meja "'.$number.'" (mobile)');
 
         return response()->json(['message' => 'Table deleted successfully.']);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\StoreProfile;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -62,6 +63,8 @@ class StoreProfileController extends Controller
 
         $profile = StoreProfile::create($validated);
 
+        ActivityLogger::log('store_profile.created', 'Menyimpan data toko (mobile)', $profile);
+
         return response()->json($profile, 201);
     }
 
@@ -90,10 +93,14 @@ class StoreProfileController extends Controller
         if (! $profile) {
             $profile = StoreProfile::create($validated);
 
+            ActivityLogger::log('store_profile.created', 'Menyimpan data toko (mobile)', $profile);
+
             return response()->json($profile, 201);
         }
 
         $profile->update($validated);
+
+        ActivityLogger::log('store_profile.updated', 'Mengupdate data toko (mobile)', $profile);
 
         return response()->json($profile);
     }

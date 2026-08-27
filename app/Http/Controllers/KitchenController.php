@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\TableStatus;
 use App\Models\Order;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -44,6 +45,8 @@ class KitchenController extends Controller
         }
 
         $order->update(['order_status' => OrderStatus::from($nextStatus)]);
+
+        ActivityLogger::log('order.status_updated', 'Mengubah status order #'.$order->order_number.' ke "'.$nextStatus.'"', $order);
 
         if ($nextStatus === 'selesai' && $order->restaurant_table_id) {
             $hasActiveOrders = Order::where('restaurant_table_id', $order->restaurant_table_id)

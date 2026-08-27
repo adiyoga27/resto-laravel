@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdditionalCost;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,10 +35,12 @@ class AdditionalCostController extends Controller
             'sort_order' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        AdditionalCost::create(array_merge($validated, [
+        $cost = AdditionalCost::create(array_merge($validated, [
             'is_active' => $request->boolean('is_active'),
             'sort_order' => $validated['sort_order'] ?? 0,
         ]));
+
+        ActivityLogger::log('additional_cost.created', 'Membuat biaya tambahan "'.$cost->name.'"', $cost);
 
         return redirect()->route('admin.additional-costs.index')->with('success', 'Biaya tambahan berhasil dibuat.');
     }
@@ -63,12 +66,17 @@ class AdditionalCostController extends Controller
             'sort_order' => $validated['sort_order'] ?? 0,
         ]));
 
+        ActivityLogger::log('additional_cost.updated', 'Mengupdate biaya tambahan "'.$additionalCost->name.'"', $additionalCost);
+
         return redirect()->route('admin.additional-costs.index')->with('success', 'Biaya tambahan berhasil diupdate.');
     }
 
     public function destroy(AdditionalCost $additionalCost): RedirectResponse
     {
+        $name = $additionalCost->name;
         $additionalCost->delete();
+
+        ActivityLogger::log('additional_cost.deleted', 'Menghapus biaya tambahan "'.$name.'"');
 
         return redirect()->route('admin.additional-costs.index')->with('success', 'Biaya tambahan berhasil dihapus.');
     }

@@ -12,6 +12,7 @@ use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -139,6 +140,11 @@ class OrderController extends Controller
             'total' => $total,
         ]);
 
+        ActivityLogger::log('order.created', 'Membuat order #'.$order->order_number.' via mobile', $order, [
+            'order_type' => $order->order_type->value,
+            'total' => (float) $order->total,
+        ]);
+
         return response()->json($order->load('orderItems.menuItem'), 201);
     }
 
@@ -182,6 +188,8 @@ class OrderController extends Controller
         ]);
 
         $order->update(['order_status' => OrderStatus::from($validated['status'])]);
+
+        ActivityLogger::log('order.status_updated', 'Mengubah status order #'.$order->order_number.' ke "'.$order->order_status->value.'" (mobile)', $order);
 
         if (in_array($validated['status'], ['selesai', 'dibatalkan']) && $order->restaurant_table_id) {
             $hasActiveOrders = Order::where('restaurant_table_id', $order->restaurant_table_id)

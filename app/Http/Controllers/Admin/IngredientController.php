@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ingredient;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -35,7 +36,9 @@ class IngredientController extends Controller
             'cost_price' => ['nullable', 'numeric', 'min:0'],
         ]);
 
-        Ingredient::create($validated);
+        $ingredient = Ingredient::create($validated);
+
+        ActivityLogger::log('ingredient.created', 'Membuat bahan baku "'.$ingredient->name.'"', $ingredient);
 
         return redirect()->route('admin.ingredients.index')
             ->with('success', 'Bahan baku berhasil ditambahkan.');
@@ -61,13 +64,18 @@ class IngredientController extends Controller
 
         $ingredient->update($validated);
 
+        ActivityLogger::log('ingredient.updated', 'Mengupdate bahan baku "'.$ingredient->name.'"', $ingredient);
+
         return redirect()->route('admin.ingredients.index')
             ->with('success', 'Bahan baku berhasil diperbarui.');
     }
 
     public function destroy(Ingredient $ingredient): RedirectResponse
     {
+        $name = $ingredient->name;
         $ingredient->delete();
+
+        ActivityLogger::log('ingredient.deleted', 'Menghapus bahan baku "'.$name.'"');
 
         return redirect()->route('admin.ingredients.index')
             ->with('success', 'Bahan baku berhasil dihapus.');

@@ -7,6 +7,7 @@ use App\Models\Ingredient;
 use App\Models\StockLog;
 use App\Models\StockOpname;
 use App\Models\StockOpnameItem;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -47,6 +48,8 @@ class StockOpnameController extends Controller
             'status' => 'draft',
             'user_id' => auth()->id(),
         ]);
+
+        ActivityLogger::log('stock_opname.created', 'Membuat stok opname nomor #'.$opname->id, $opname);
 
         foreach ($validated['actual_stock'] as $ingredientId => $actualStock) {
             if ($actualStock === null || $actualStock === '') {
@@ -105,6 +108,8 @@ class StockOpnameController extends Controller
 
         $stockOpname->update(['status' => 'posted']);
 
+        ActivityLogger::log('stock_opname.posted', 'Memposting stok opname nomor #'.$stockOpname->id, $stockOpname);
+
         return redirect()->route('admin.stock-opnames.show', $stockOpname)
             ->with('success', 'Stok opname berhasil diposting. Stok bahan baku telah disesuaikan.');
     }
@@ -117,6 +122,8 @@ class StockOpnameController extends Controller
 
         $stockOpname->items()->delete();
         $stockOpname->delete();
+
+        ActivityLogger::log('stock_opname.deleted', 'Menghapus stok opname nomor #'.$stockOpname->id);
 
         return redirect()->route('admin.stock-opnames.index')
             ->with('success', 'Stok opname berhasil dihapus.');

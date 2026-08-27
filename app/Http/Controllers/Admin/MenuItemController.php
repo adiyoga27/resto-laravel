@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -68,7 +69,9 @@ class MenuItemController extends Controller
             $validated['image'] = $request->file('image')->store('menu-images', 'public');
         }
 
-        MenuItem::create($validated);
+        $menuItem = MenuItem::create($validated);
+
+        ActivityLogger::log('menu_item.created', 'Membuat menu "'.$menuItem->name.'"', $menuItem);
 
         return redirect()->route('admin.menu-items.index')->with('success', 'Menu berhasil dibuat.');
     }
@@ -107,12 +110,17 @@ class MenuItemController extends Controller
 
         $menuItem->update($validated);
 
+        ActivityLogger::log('menu_item.updated', 'Mengupdate menu "'.$menuItem->name.'"', $menuItem);
+
         return redirect()->route('admin.menu-items.index')->with('success', 'Menu berhasil diupdate.');
     }
 
     public function destroy(MenuItem $menuItem): RedirectResponse
     {
+        $name = $menuItem->name;
         $menuItem->delete();
+
+        ActivityLogger::log('menu_item.deleted', 'Menghapus menu "'.$name.'"');
 
         return redirect()->route('admin.menu-items.index')->with('success', 'Menu berhasil dihapus.');
     }

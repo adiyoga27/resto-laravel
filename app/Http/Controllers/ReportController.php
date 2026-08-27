@@ -8,6 +8,7 @@ use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use App\Services\ExcelExport;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +24,7 @@ class ReportController extends Controller
         $period = $request->get('period', 'daily');
         $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : now()->startOfMonth();
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
+        $status = $request->get('status');
 
         $query = Order::whereBetween('created_at', [$startDate, $endDate]);
 
@@ -30,8 +32,19 @@ class ReportController extends Controller
             $query->forKasir(auth()->id());
         }
 
+        if ($status) {
+            $query->where('order_status', $status);
+        }
+
         $orders = $query->with(['restaurantTable', 'createdBy'])->orderBy('created_at', 'desc')->paginate(20);
-        $totalRevenue = $query->where('order_status', '!=', 'dibatalkan')->sum('total');
+
+        $revenueQuery = (clone $query);
+
+        if (! $status) {
+            $revenueQuery->where('order_status', '!=', 'dibatalkan');
+        }
+
+        $totalRevenue = $revenueQuery->sum('total');
         $totalOrders = $query->count();
 
         return Inertia::render('Reports/Sales', [
@@ -42,6 +55,7 @@ class ReportController extends Controller
                 'period' => $period,
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
+                'status' => $status,
             ],
         ]);
     }
@@ -91,6 +105,11 @@ class ReportController extends Controller
             $this->freeTableIfNoActiveOrders($order->restaurant_table_id, $order->id);
         }
 
+        ActivityLogger::log('sales.updated', 'Mengupdate order #'.$order->order_number, $order, [
+            'order_status' => $order->order_status->value,
+            'total' => (float) $order->total,
+        ]);
+
         return redirect()->route('reports.sales', request()->only(['start_date', 'end_date']))
             ->with('success', 'Order #'.$order->order_number.' berhasil diperbarui.');
     }
@@ -98,6 +117,7 @@ class ReportController extends Controller
     public function destroy(Order $order): RedirectResponse
     {
         $tableId = $order->restaurant_table_id;
+        $orderNumber = $order->order_number;
 
         $order->orderItems()->delete();
         $order->payments()->delete();
@@ -106,6 +126,8 @@ class ReportController extends Controller
         if ($tableId) {
             $this->freeTableIfNoActiveOrders($tableId, $order->id);
         }
+
+        ActivityLogger::log('sales.deleted', 'Menghapus order #'.$orderNumber);
 
         return redirect()->route('reports.sales', request()->only(['start_date', 'end_date']))
             ->with('success', 'Order #'.$order->order_number.' berhasil dihapus.');
@@ -177,6 +199,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date') ? Carbon::parse($request->get('end_date'))->endOfDay() : now()->endOfDay();
 
         $orders = Order::whereBetween('created_at', [$startDate, $endDate])
+            ->when($request->get('status'), fn ($query) => $query->where('order_status', $request->get('status')))
             ->orderBy('created_at', 'desc')
             ->get();
 

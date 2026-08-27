@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AdditionalCostController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IngredientController;
@@ -69,6 +70,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/stock-opnames', [StockOpnameController::class, 'index'])->name('stock-opnames.index');
         Route::get('/stock-opnames/create', [StockOpnameController::class, 'create'])->name('stock-opnames.create');
         Route::get('/order-logs', [OrderLogController::class, 'index'])->name('order-logs.index');
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('/activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
         Route::post('/stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
         Route::get('/stock-opnames/{stockOpname}', [StockOpnameController::class, 'show'])->name('stock-opnames.show');
         Route::post('/stock-opnames/{stockOpname}/post', [StockOpnameController::class, 'post'])->name('stock-opnames.post');

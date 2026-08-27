@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ingredient;
 use App\Models\MenuItem;
 use App\Models\StockLog;
+use App\Services\ActivityLogger;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -67,7 +68,7 @@ class StockLogController extends Controller
             $stockAfter = $validated['quantity'];
         }
 
-        StockLog::create([
+        $stockLog = StockLog::create([
             'ingredient_id' => $ingredient->id,
             'type' => $validated['type'],
             'quantity' => $validated['quantity'],
@@ -79,6 +80,12 @@ class StockLogController extends Controller
         ]);
 
         $ingredient->update(['current_stock' => $stockAfter]);
+
+        ActivityLogger::log('stock_log.created', 'Mencatat mutasi stok "'.$ingredient->name.'" ('.$validated['type'].')', $stockLog, [
+            'quantity' => $validated['quantity'],
+            'stock_before' => $stockBefore,
+            'stock_after' => $stockAfter,
+        ]);
 
         return redirect()->route('admin.stock-logs.index')
             ->with('success', 'Mutasi stok berhasil dicatat.');
@@ -127,6 +134,11 @@ class StockLogController extends Controller
         }
 
         $menuItem->increment('stock', $validated['quantity']);
+
+        ActivityLogger::log('stock_log.production', 'Produksi menu "'.$menuItem->name.'" x'.$validated['quantity'], null, [
+            'menu_item_id' => $menuItem->id,
+            'quantity' => $validated['quantity'],
+        ]);
 
         return redirect()->route('admin.stock-logs.index')
             ->with('success', 'Produksi '.$menuItem->name.' x'.$validated['quantity'].' berhasil. Stok produk bertambah.');

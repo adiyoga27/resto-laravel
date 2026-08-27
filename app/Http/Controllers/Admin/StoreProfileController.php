@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\StoreProfile;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,6 +25,8 @@ class StoreProfileController extends Controller
 
         $this->upsert($validated);
 
+        ActivityLogger::log('store_profile.created', 'Menyimpan data toko');
+
         return redirect()->route('admin.store-profiles.index')->with('success', 'Data toko berhasil disimpan.');
     }
 
@@ -32,6 +35,8 @@ class StoreProfileController extends Controller
         $validated = $this->validatedData($request);
 
         $this->upsert($validated);
+
+        ActivityLogger::log('store_profile.updated', 'Mengupdate data toko');
 
         return redirect()->route('admin.store-profiles.index')->with('success', 'Data toko berhasil diupdate.');
     }

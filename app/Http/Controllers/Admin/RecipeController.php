@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ingredient;
 use App\Models\MenuItem;
 use App\Models\RecipeItem;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -41,12 +42,24 @@ class RecipeController extends Controller
             'quantity' => ['required', 'numeric', 'min:0.01'],
         ]);
 
+        $menuItem = MenuItem::find($validated['menu_item_id']);
+        $ingredient = Ingredient::find($validated['ingredient_id']);
+
+        $exists = RecipeItem::where('menu_item_id', $validated['menu_item_id'])
+            ->where('ingredient_id', $validated['ingredient_id'])
+            ->exists();
+
         RecipeItem::updateOrCreate(
             [
                 'menu_item_id' => $validated['menu_item_id'],
                 'ingredient_id' => $validated['ingredient_id'],
             ],
             ['quantity' => $validated['quantity']]
+        );
+
+        ActivityLogger::log(
+            $exists ? 'recipe.updated' : 'recipe.created',
+            ($exists ? 'Mengupdate' : 'Membuat').' resep "'.$menuItem?->name.'" - "'.$ingredient?->name.'"'
         );
 
         return redirect()->route('admin.recipes.index', ['menu_item_id' => $validated['menu_item_id']])
@@ -56,7 +69,10 @@ class RecipeController extends Controller
     public function destroy(RecipeItem $recipe): RedirectResponse
     {
         $menuItemId = $recipe->menu_item_id;
+        $menuName = $recipe->menuItem?->name;
         $recipe->delete();
+
+        ActivityLogger::log('recipe.deleted', 'Menghapus item resep "'.$menuName.'"');
 
         return redirect()->route('admin.recipes.index', ['menu_item_id' => $menuItemId])
             ->with('success', 'Item resep berhasil dihapus.');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\TableStatus;
 use App\Http\Controllers\Controller;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -35,7 +36,9 @@ class TableController extends Controller
         ]);
 
         $validated['status'] = TableStatus::Kosong;
-        RestaurantTable::create($validated);
+        $table = RestaurantTable::create($validated);
+
+        ActivityLogger::log('table.created', 'Membuat meja "'.$table->table_number.'"', $table);
 
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil dibuat.');
     }
@@ -67,12 +70,17 @@ class TableController extends Controller
 
         $table->update($validated);
 
+        ActivityLogger::log('table.updated', 'Mengupdate meja "'.$table->table_number.'"', $table);
+
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil diupdate.');
     }
 
     public function destroy(RestaurantTable $table): RedirectResponse
     {
+        $number = $table->table_number;
         $table->delete();
+
+        ActivityLogger::log('table.deleted', 'Menghapus meja "'.$number.'"');
 
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil dihapus.');
     }

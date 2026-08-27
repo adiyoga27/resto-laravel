@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,11 +37,17 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        ActivityLogger::log('auth.login', 'Login ke sistem', $request->user());
+
         return redirect()->intended($this->redirectByRole($request->user()));
     }
 
     public function logout(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        ActivityLogger::log('auth.logout', 'Logout dari sistem', $user);
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

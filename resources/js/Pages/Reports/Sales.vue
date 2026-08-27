@@ -21,6 +21,7 @@ const isAdmin = page.props.auth.user?.is_admin;
 const filterForm = useForm({
     start_date: props.filters.start_date,
     end_date: props.filters.end_date,
+    status: props.filters.status ?? '',
 });
 
 const applyFilter = () => {
@@ -84,7 +85,7 @@ defineOptions({ layout: AppLayout });
     <div>
         <PageHeader title="Laporan Penjualan" subtitle="Rekap transaksi penjualan">
             <a
-                :href="route('reports.sales.export', { start_date: filterForm.start_date, end_date: filterForm.end_date })"
+                :href="route('reports.sales.export', { start_date: filterForm.start_date, end_date: filterForm.end_date, status: filterForm.status })"
                 class="btn-success"
             >
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -101,6 +102,17 @@ defineOptions({ layout: AppLayout });
                 <div class="sm:w-48">
                     <label class="label">Sampai Tanggal</label>
                     <input v-model="filterForm.end_date" type="date" class="input">
+                </div>
+                <div class="sm:w-44">
+                    <label class="label">Status</label>
+                    <select v-model="filterForm.status" class="input">
+                        <option value="">Semua Status</option>
+                        <option value="baru">Baru</option>
+                        <option value="diproses">Diproses</option>
+                        <option value="siap">Siap</option>
+                        <option value="selesai">Selesai</option>
+                        <option value="dibatalkan">Dibatalkan</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn-primary">Terapkan</button>
             </form>

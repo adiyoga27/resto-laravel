@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -56,6 +57,8 @@ class ReservationController extends Controller
         $validated['status'] = ReservationStatus::Pending;
 
         $reservation = Reservation::create($validated);
+
+        ActivityLogger::log('reservation.created', 'Membuat reservasi untuk meja '.$reservation->restaurant_table_id.' (mobile)', $reservation);
 
         return response()->json($reservation->load('restaurantTable'), 201);
     }

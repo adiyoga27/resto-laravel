@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CashFlow;
 use App\Models\Order;
+use App\Services\ActivityLogger;
 use App\Services\ExcelExport;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -71,7 +72,7 @@ class CashFlowController extends Controller
             'reference' => ['nullable', 'string', 'max:100'],
         ]);
 
-        CashFlow::create([
+        $cashFlow = CashFlow::create([
             'date' => $validated['date'],
             'description' => $validated['description'],
             'type' => $validated['type'],
@@ -80,6 +81,8 @@ class CashFlowController extends Controller
             'is_posted' => false,
             'created_by' => auth()->id(),
         ]);
+
+        ActivityLogger::log('cash_flow.created', 'Menambah entri arus kas "'.$cashFlow->description.'"', $cashFlow);
 
         return redirect()->route('reports.cash-flow', request()->only(['start_date', 'end_date']))
             ->with('success', 'Entri arus kas berhasil ditambahkan.');
@@ -101,6 +104,8 @@ class CashFlowController extends Controller
 
         $cashFlow->update($validated);
 
+        ActivityLogger::log('cash_flow.updated', 'Mengupdate entri arus kas "'.$cashFlow->description.'"', $cashFlow);
+
         return redirect()->route('reports.cash-flow', request()->only(['start_date', 'end_date']))
             ->with('success', 'Entri arus kas berhasil diperbarui.');
     }
@@ -111,7 +116,10 @@ class CashFlowController extends Controller
             return redirect()->back()->with('error', 'Entri yang sudah diposting tidak dapat dihapus.');
         }
 
+        $description = $cashFlow->description;
         $cashFlow->delete();
+
+        ActivityLogger::log('cash_flow.deleted', 'Menghapus entri arus kas "'.$description.'"');
 
         return redirect()->route('reports.cash-flow', request()->only(['start_date', 'end_date']))
             ->with('success', 'Entri arus kas berhasil dihapus.');
@@ -125,6 +133,8 @@ class CashFlowController extends Controller
 
         $cashFlow->post(auth()->id());
 
+        ActivityLogger::log('cash_flow.posted', 'Memposting entri arus kas "'.$cashFlow->description.'"', $cashFlow);
+
         return redirect()->route('reports.cash-flow', request()->only(['start_date', 'end_date']))
             ->with('success', 'Entri arus kas berhasil diposting.');
     }
@@ -136,6 +146,8 @@ class CashFlowController extends Controller
         }
 
         $cashFlow->unpost();
+
+        ActivityLogger::log('cash_flow.unposted', 'Membatalkan posting entri arus kas "'.$cashFlow->description.'"', $cashFlow);
 
         return redirect()->route('reports.cash-flow', request()->only(['start_date', 'end_date']))
             ->with('success', 'Posting entri arus kas berhasil dibatalkan.');
@@ -193,6 +205,11 @@ class CashFlowController extends Controller
 
             $order->update(['is_posted_to_cash_flow' => true]);
         }
+
+        ActivityLogger::log('cash_flow.posted_transactions', 'Posting '.$orders->count().' transaksi penjualan ke Arus Kas', null, [
+            'order_ids' => $orders->pluck('id')->all(),
+            'total' => $orders->sum('total'),
+        ]);
 
         return redirect()->route('reports.cash-flow.posting', request()->only(['start_date', 'end_date']))
             ->with('success', $orders->count().' transaksi berhasil diposting ke Arus Kas.');

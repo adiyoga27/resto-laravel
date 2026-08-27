@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\RestaurantTable;
+use App\Services\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -158,6 +159,13 @@ class PosController extends Controller
             'reference' => $reference,
         ]);
 
+        ActivityLogger::log('order.checkout', 'Checkout order #'.$order->order_number, $order, [
+            'order_type' => $order->order_type->value,
+            'total' => (float) $order->total,
+            'payment_method' => PaymentMethod::from($validated['payment_method'])->value,
+            'items' => $order->orderItems->sum('quantity'),
+        ]);
+
         return redirect()->route('pos.index')->with([
             'success_order_id' => $order->id,
             'success_order_number' => $order->order_number,
@@ -249,6 +257,13 @@ class PosController extends Controller
             'reference' => $reference,
         ]);
 
+        ActivityLogger::log('order.updated', 'Mengupdate order #'.$order->order_number, $order, [
+            'order_type' => $order->order_type->value,
+            'total' => (float) $order->total,
+            'payment_method' => PaymentMethod::from($validated['payment_method'])->value,
+            'items' => $order->orderItems->sum('quantity'),
+        ]);
+
         return redirect()->route('pos.index')->with([
             'success_order_id' => $order->id,
             'success_order_number' => $order->order_number,
@@ -274,6 +289,8 @@ class PosController extends Controller
             $order->mutateStock();
         }
 
+        ActivityLogger::log('order.completed', 'Menyelesaikan order #'.$order->order_number, $order);
+
         if ($order->restaurant_table_id) {
             $this->freeTableIfNoActiveOrders($order->restaurant_table_id);
         }
@@ -284,6 +301,8 @@ class PosController extends Controller
     public function cancelOrder(Order $order): RedirectResponse
     {
         $order->update(['order_status' => OrderStatus::Dibatalkan]);
+
+        ActivityLogger::log('order.cancelled', 'Membatalkan order #'.$order->order_number, $order);
 
         if ($order->restaurant_table_id) {
             $this->freeTableIfNoActiveOrders($order->restaurant_table_id);
