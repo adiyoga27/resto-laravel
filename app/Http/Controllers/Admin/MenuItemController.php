@@ -99,6 +99,8 @@ class MenuItemController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('menu-images', 'public');
+        } else {
+            unset($validated['image']);
         }
 
         $menuItem->update($validated);
