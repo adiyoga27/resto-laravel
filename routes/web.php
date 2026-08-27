@@ -17,6 +17,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QzSignController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\ReportController;
@@ -28,6 +29,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::post('/qz/sign', QzSignController::class)->name('qz.sign');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     Route::get('/', function () {
         return redirect()->route(
