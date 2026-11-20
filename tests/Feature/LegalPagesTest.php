@@ -42,3 +42,21 @@ test('delete account page falls back to the restaurant admin without a support e
         ->assertSee('Hubungi admin restoran Anda')
         ->assertDontSee('mailto:', false);
 });
+
+test('terms of service page is public', function () {
+    $this->get('/terms')
+        ->assertOk()
+        ->assertSee('Syarat dan Ketentuan Shadja POS')
+        ->assertSee('PT Coding Aja Indonesia')
+        ->assertSee(route('legal.privacy'));
+});
+
+test('terms of service page shows the support email when configured', function () {
+    config(['services.support.email' => 'support@example.test']);
+
+    $this->get('/terms')->assertSee('mailto:support@example.test', false);
+});
+
+test('legal pages link to the terms of service', function () {
+    $this->get('/privacy-policy')->assertSee(route('legal.terms'));
+});

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/privacy-policy', 'legal.privacy')->name('legal.privacy');
 Route::view('/delete-account', 'legal.delete-account')->name('legal.delete-account');
+Route::view('/terms', 'legal.terms')->name('legal.terms');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

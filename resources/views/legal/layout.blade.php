@@ -22,6 +22,7 @@
     <footer>
         Shadja POS &middot; PT Coding Aja Indonesia, Denpasar, Bali, Indonesia<br>
         <a href="{{ route('legal.privacy') }}">Kebijakan Privasi</a> &middot;
+        <a href="{{ route('legal.terms') }}">Syarat dan Ketentuan</a> &middot;
         <a href="{{ route('legal.delete-account') }}">Hapus Akun</a>
     </footer>
 </main>
