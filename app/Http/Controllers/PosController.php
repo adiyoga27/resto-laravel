@@ -8,7 +8,6 @@ use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\TableStatus;
-use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -23,7 +22,7 @@ use Inertia\Response;
 
 class PosController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $menuItems = MenuItem::with('category')
             ->where('is_active', true)
@@ -46,7 +45,7 @@ class PosController extends Controller
         return Inertia::render('Pos/Index', [
             'menuItems' => $menuItems,
             'tables' => $tables,
-            'additionalCosts' => AdditionalCost::active()->ordered()->get(),
+            'additionalCost' => $request->user()->applicableAdditionalCost(),
             'activeOrders' => $activeOrders,
             'printer' => config('pos.printer'),
             'successOrder' => session('success_order_id') ? [
@@ -78,7 +77,6 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -90,7 +88,7 @@ class PosController extends Controller
         }
 
         $discount = (float) ($validated['discount'] ?? 0);
-        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
+        $additionalCost = $request->user()->applicableAdditionalCost();
         $additionalCostRate = $additionalCost?->rate !== null ? (float) $additionalCost->rate : 0;
 
         $order = Order::create([
@@ -196,12 +194,11 @@ class PosController extends Controller
             'payment_amount' => ['required', 'numeric', 'min:0'],
             'cash_received' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
         ]);
 
         $discount = (float) ($validated['discount'] ?? 0);
-        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
+        $additionalCost = $request->user()->applicableAdditionalCost();
         $additionalCostRate = $additionalCost?->rate !== null ? (float) $additionalCost->rate : 0;
 
         $order->orderItems()->delete();

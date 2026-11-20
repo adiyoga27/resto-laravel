@@ -16,8 +16,8 @@ endpoints:
       subgroupDescription: ''
       title: 'List available additional costs'
       description: |-
-        Get the list of active additional costs (e.g. service charge 5%) that can be
-        applied to an order via `additional_cost_id`.
+        Get the active additional costs (e.g. service charge 5%) assigned to the
+        authenticated user. The first one is applied automatically to the user's orders.
       authenticated: true
       deprecated: false
     headers:

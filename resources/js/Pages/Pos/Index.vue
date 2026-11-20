@@ -8,7 +8,7 @@ import { setupQzSecurity, loadQzScript, printerSettings, buildReceiptData, print
 const props = defineProps({
     menuItems: Object,
     tables: Array,
-    additionalCosts: Array,
+    additionalCost: Object,
     activeOrders: Array,
     printer: Object,
     successOrder: Object,
@@ -18,7 +18,6 @@ const cart = ref([]);
 const selectedOrderType = ref('dine-in');
 const selectedTable = ref(null);
 const discount = ref(0);
-const selectedAdditionalCostId = ref(null);
 const editingOrderId = ref(null);
 const search = ref('');
 const customerName = ref('');
@@ -43,7 +42,7 @@ const filteredCategories = computed(() => {
 
 const cartSubtotal = computed(() => cart.value.reduce((sum, item) => sum + cartItemPrice(item) * item.qty, 0));
 const afterDiscount = computed(() => Math.max(0, cartSubtotal.value - (discount.value || 0)));
-const selectedAdditionalCost = computed(() => props.additionalCosts.find((c) => c.id === selectedAdditionalCostId.value));
+const selectedAdditionalCost = computed(() => props.additionalCost);
 const serviceChargeRate = computed(() => (selectedAdditionalCost.value ? Number(selectedAdditionalCost.value.rate) : 0));
 const serviceCharge = computed(() => (serviceChargeRate.value > 0 ? Math.round(afterDiscount.value * (serviceChargeRate.value / 100) * 100) / 100 : 0));
 const cartTotal = computed(() => afterDiscount.value + serviceCharge.value);
@@ -99,7 +98,6 @@ const resetCart = () => {
     selectedOrderType.value = 'dine-in';
     selectedTable.value = null;
     discount.value = 0;
-    selectedAdditionalCostId.value = null;
     editingOrderId.value = null;
     customerName.value = '';
     customerPhone.value = '';
@@ -140,7 +138,6 @@ const submitOrder = () => {
         payment_amount: cartTotal.value,
         cash_received: cashReceived.value,
         discount: discount.value,
-        additional_cost_id: selectedAdditionalCostId.value,
         payment_reference: paymentReference,
         notes: notes.value,
     };
@@ -163,7 +160,6 @@ const editOrder = (order) => {
         notes: i.notes ?? '',
     }));
     discount.value = 0;
-    selectedAdditionalCostId.value = null;
     resetCartStateKeepEditing(order);
 };
 
@@ -424,15 +420,6 @@ defineOptions({ layout: AppLayout });
                         <div>
                             <label class="label">Diskon (Rp)</label>
                             <input v-model.number="discount" type="number" min="0" class="input" placeholder="0">
-                        </div>
-                        <div>
-                            <label class="label">Biaya Tambahan</label>
-                            <select v-model="selectedAdditionalCostId" class="input">
-                                <option :value="null">Tanpa biaya tambahan</option>
-                                <option v-for="cost in additionalCosts" :key="cost.id" :value="cost.id">
-                                    {{ cost.name }} ({{ cost.rate }}%)
-                                </option>
-                            </select>
                         </div>
                         <div>
                             <label class="label">Metode Pembayaran</label>

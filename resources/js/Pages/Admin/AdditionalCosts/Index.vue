@@ -30,7 +30,7 @@ defineOptions({ layout: AppLayout });
 
 <template>
     <div>
-        <PageHeader title="Biaya Tambahan" subtitle="Kelola nama dan persentase biaya tambahan (mis. service 5%)">
+        <PageHeader title="Biaya Tambahan" subtitle="Kelola biaya tambahan (mis. service 5%) dan user yang dikenakan">
             <Link :href="route('admin.additional-costs.create')" class="btn-primary">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 4v16m8-8H4" /></svg>
                 Tambah Biaya
@@ -39,11 +39,12 @@ defineOptions({ layout: AppLayout });
 
         <div class="card overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[560px] text-left">
+                <table class="w-full min-w-[720px] text-left">
                     <thead class="border-b border-slate-200 bg-slate-50">
                         <tr>
                             <th class="table-th">Nama</th>
                             <th class="table-th">Persentase</th>
+                            <th class="table-th">Dikenakan ke</th>
                             <th class="table-th">Status</th>
                             <th class="table-th text-right">Aksi</th>
                         </tr>
@@ -52,6 +53,12 @@ defineOptions({ layout: AppLayout });
                         <tr v-for="cost in costs.data" :key="cost.id" class="transition hover:bg-slate-50">
                             <td class="table-td font-semibold text-slate-800">{{ cost.name }}</td>
                             <td class="table-td">{{ cost.rate }}%</td>
+                            <td class="table-td">
+                                <div v-if="cost.users.length" class="flex flex-wrap gap-1">
+                                    <span v-for="user in cost.users" :key="user.id" class="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{{ user.email }}</span>
+                                </div>
+                                <span v-else class="text-xs text-slate-400">Belum ada user</span>
+                            </td>
                             <td class="table-td">
                                 <StatusBadge :value="cost.is_active ? 'active' : 'inactive'">{{ cost.is_active ? 'Aktif' : 'Nonaktif' }}</StatusBadge>
                             </td>
@@ -67,7 +74,7 @@ defineOptions({ layout: AppLayout });
                             </td>
                         </tr>
                         <tr v-if="!costs.data.length">
-                            <td colspan="4" class="px-6 py-16 text-center">
+                            <td colspan="5" class="px-6 py-16 text-center">
                                 <p class="text-4xl">💰</p>
                                 <p class="mt-2 font-medium text-slate-500">Belum ada biaya tambahan</p>
                             </td>

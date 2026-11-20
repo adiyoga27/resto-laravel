@@ -149,7 +149,7 @@ endpoints:
         name: reservation_id
         description: 'The ID of the reservation.'
         required: true
-        example: 16
+        example: 1
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -167,7 +167,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      reservation_id: 16
+      reservation_id: 1
       reservation: 16
     queryParameters: []
     cleanQueryParameters: []

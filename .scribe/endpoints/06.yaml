@@ -113,17 +113,6 @@ endpoints:
         exampleWasSpecified: true
         nullable: true
         deprecated: false
-      additional_cost_id:
-        custom: []
-        name: additional_cost_id
-        description: 'ID biaya tambahan dari master data.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: true
-        deprecated: false
       'items[].menu_item_id':
         custom: []
         name: 'items[].menu_item_id'
@@ -200,7 +189,6 @@ endpoints:
       customer_name: 'John Doe'
       customer_phone: '08123456789'
       discount: '5000'
-      additional_cost_id: 1
     fileParameters: []
     responses:
       -
@@ -275,7 +263,7 @@ endpoints:
         name: order_id
         description: 'The ID of the order.'
         required: true
-        example: 16
+        example: 20
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -293,7 +281,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      order_id: 16
+      order_id: 20
       order: 16
     queryParameters: []
     cleanQueryParameters: []
@@ -336,7 +324,7 @@ endpoints:
         name: order_id
         description: 'The ID of the order.'
         required: true
-        example: 16
+        example: 20
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -354,7 +342,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      order_id: 16
+      order_id: 20
       order: 16
     queryParameters: []
     cleanQueryParameters: []

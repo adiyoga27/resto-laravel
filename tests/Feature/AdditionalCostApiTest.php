@@ -7,10 +7,12 @@ test('unauthenticated user cannot fetch additional costs', function () {
     $this->getJson('/api/v1/additional-costs')->assertUnauthorized();
 });
 
-test('authenticated user can list active additional costs', function () {
+test('authenticated user only lists active additional costs assigned to them', function () {
     $user = User::factory()->create();
     $active = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5, 'is_active' => true]);
-    AdditionalCost::factory()->create(['name' => 'Arsip', 'rate' => 10, 'is_active' => false]);
+    $active->users()->attach($user);
+    AdditionalCost::factory()->create(['name' => 'Arsip', 'rate' => 10, 'is_active' => false])->users()->attach($user);
+    AdditionalCost::factory()->create(['name' => 'Lainnya', 'rate' => 3, 'is_active' => true]);
 
     $this->actingAs($user)
         ->getJson('/api/v1/additional-costs')

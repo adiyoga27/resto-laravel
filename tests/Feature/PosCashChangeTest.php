@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\RestaurantTable;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('kasir can store a cash order with cash received and change', function () {
     $kasir = User::factory()->kasir()->create();
@@ -60,10 +61,11 @@ test('kasir can store a cash order without cash received and change stays null',
     expect($payment->change)->toBeNull();
 });
 
-test('kasir can store an order with additional cost from master data', function () {
+test('kasir assigned to an additional cost is charged automatically', function () {
     $kasir = User::factory()->kasir()->create();
     $menuItem = MenuItem::factory()->create(['price' => 10000]);
     $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
+    $cost->users()->attach($kasir);
 
     $this->actingAs($kasir)
         ->post(route('pos.orders.store'), [
@@ -71,7 +73,6 @@ test('kasir can store an order with additional cost from master data', function 
             'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
             'payment_method' => 'qris',
             'payment_amount' => 21000,
-            'additional_cost_id' => $cost->id,
             'discount' => 0,
         ])
         ->assertRedirect(route('pos.index'));
@@ -89,6 +90,7 @@ test('additional cost is computed on amount after discount', function () {
     $kasir = User::factory()->kasir()->create();
     $menuItem = MenuItem::factory()->create(['price' => 10000]);
     $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
+    $cost->users()->attach($kasir);
 
     $this->actingAs($kasir)
         ->post(route('pos.orders.store'), [
@@ -97,7 +99,6 @@ test('additional cost is computed on amount after discount', function () {
             'payment_method' => 'cash',
             'payment_amount' => 18900,
             'cash_received' => 25000,
-            'additional_cost_id' => $cost->id,
             'discount' => 2000,
         ])
         ->assertRedirect(route('pos.index'));
@@ -111,6 +112,63 @@ test('additional cost is computed on amount after discount', function () {
 
     $payment = Payment::where('order_id', $order->id)->first();
     expect((float) $payment->change)->toBe(6100.0);
+});
+
+test('kasir not assigned to any additional cost is not charged', function () {
+    $kasir = User::factory()->kasir()->create();
+    $otherKasir = User::factory()->kasir()->create();
+    $menuItem = MenuItem::factory()->create(['price' => 10000]);
+    AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5])->users()->attach($otherKasir);
+
+    $this->actingAs($kasir)
+        ->post(route('pos.orders.store'), [
+            'order_type' => 'pickup',
+            'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 2, 'notes' => '']],
+            'payment_method' => 'qris',
+            'payment_amount' => 20000,
+            'discount' => 0,
+        ])
+        ->assertRedirect(route('pos.index'));
+
+    $order = Order::where('created_by', $kasir->id)->first();
+    expect($order->additional_cost_id)->toBeNull();
+    expect((float) $order->additional_cost)->toBe(0.0);
+    expect((float) $order->total)->toBe(20000.0);
+});
+
+test('inactive additional cost is not charged even when the kasir is assigned', function () {
+    $kasir = User::factory()->kasir()->create();
+    $menuItem = MenuItem::factory()->create(['price' => 10000]);
+    AdditionalCost::factory()->create(['rate' => 5, 'is_active' => false])->users()->attach($kasir);
+
+    $this->actingAs($kasir)
+        ->post(route('pos.orders.store'), [
+            'order_type' => 'pickup',
+            'items' => [['menu_item_id' => $menuItem->id, 'quantity' => 1, 'notes' => '']],
+            'payment_method' => 'qris',
+            'payment_amount' => 10000,
+            'discount' => 0,
+        ])
+        ->assertRedirect(route('pos.index'));
+
+    $order = Order::where('created_by', $kasir->id)->first();
+    expect($order->additional_cost_id)->toBeNull();
+    expect((float) $order->total)->toBe(10000.0);
+});
+
+test('pos page only receives the additional cost assigned to the logged in kasir', function () {
+    $kasir = User::factory()->kasir()->create();
+    $otherKasir = User::factory()->kasir()->create();
+    $cost = AdditionalCost::factory()->create(['name' => 'Service Charge', 'rate' => 5]);
+    $cost->users()->attach($kasir);
+
+    $this->actingAs($kasir)
+        ->get(route('pos.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('additionalCost.id', $cost->id));
+
+    $this->actingAs($otherKasir)
+        ->get(route('pos.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('additionalCost', null));
 });
 
 test('receipt includes additional cost for orders with additional cost', function () {

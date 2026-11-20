@@ -7,7 +7,6 @@ use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Enums\TableStatus;
 use App\Http\Controllers\Controller;
-use App\Models\AdditionalCost;
 use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -54,7 +53,6 @@ class OrderController extends Controller
      * @bodyParam customer_phone string Optional customer phone number. Example: 08123456789
      * @bodyParam delivery_address string required if order_type=delivery. Example: Jl. Merdeka No. 10
      * @bodyParam discount numeric Discount amount. Example: 5000
-     * @bodyParam additional_cost_id integer ID biaya tambahan dari master data. Example: 1
      * @bodyParam notes string Optional order notes.
      *
      * @response 201 {"id":1,"order_number":"ORD-20260101-ABC123","order_type":"delivery","order_status":"baru","subtotal":50000,"discount":5000,"tax":0,"total":45000,"customer_name":"John Doe","customer_phone":"08123456789","order_items":[{"id":1,"menu_item_id":1,"quantity":2,"price":25000,"subtotal":50000,"menu_item":{"id":1,"name":"Nasi Goreng","price":25000}}]}
@@ -73,7 +71,6 @@ class OrderController extends Controller
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['nullable', 'string', 'max:20'],
             'discount' => ['nullable', 'numeric', 'min:0'],
-            'additional_cost_id' => ['nullable', 'integer', 'exists:additional_costs,id'],
         ]);
 
         if ($validated['order_type'] === 'dine-in') {
@@ -84,7 +81,7 @@ class OrderController extends Controller
         }
 
         $discount = (float) ($validated['discount'] ?? 0);
-        $additionalCost = $validated['additional_cost_id'] ?? null ? AdditionalCost::find($validated['additional_cost_id']) : null;
+        $additionalCost = $request->user()->applicableAdditionalCost();
         $additionalCostRate = $additionalCost?->rate !== null ? (float) $additionalCost->rate : 0;
 
         $order = Order::create([

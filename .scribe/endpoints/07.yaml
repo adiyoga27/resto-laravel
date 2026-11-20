@@ -134,7 +134,7 @@ endpoints:
         name: payment_id
         description: 'The ID of the payment.'
         required: true
-        example: 16
+        example: 19
         type: integer
         enumValues: []
         exampleWasSpecified: false
@@ -152,7 +152,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      payment_id: 16
+      payment_id: 19
       payment: 16
     queryParameters: []
     cleanQueryParameters: []

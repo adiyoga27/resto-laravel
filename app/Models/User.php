@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -77,5 +78,19 @@ class User extends Authenticatable
     public function cashFlowsPosted(): HasMany
     {
         return $this->hasMany(CashFlow::class, 'posted_by');
+    }
+
+    public function additionalCosts(): BelongsToMany
+    {
+        return $this->belongsToMany(AdditionalCost::class)->withTimestamps();
+    }
+
+    /**
+     * The active additional cost automatically charged on orders made by this user.
+     * When several are assigned, the first by sort order wins.
+     */
+    public function applicableAdditionalCost(): ?AdditionalCost
+    {
+        return $this->additionalCosts()->active()->ordered()->first();
     }
 }
