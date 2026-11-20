@@ -24,6 +24,9 @@ use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
+Route::view('/privacy-policy', 'legal.privacy')->name('legal.privacy');
+Route::view('/delete-account', 'legal.delete-account')->name('legal.delete-account');
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

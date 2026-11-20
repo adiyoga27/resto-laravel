@@ -103,7 +103,7 @@ defineOptions({ layout: AppLayout });
         <Modal
             :open="!!deleting"
             title="Hapus User"
-            :message="`Yakin ingin menghapus user ${deleting?.name}? Tindakan ini tidak bisa dibatalkan.`"
+            :message="`Yakin ingin menghapus user ${deleting?.name}? Catatan transaksi tetap tersimpan, tapi nama pembuatnya hilang. Untuk staf yang berhenti, lebih baik nonaktifkan lewat Edit. Tindakan ini tidak bisa dibatalkan.`"
             :busy="busy"
             @close="deleting = null"
             @confirm="confirmDelete"

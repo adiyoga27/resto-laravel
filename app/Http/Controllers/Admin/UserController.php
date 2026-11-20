@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -85,11 +86,17 @@ class UserController extends Controller
             unset($validated['password']);
         }
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        // Admin tidak bisa mengunci akunnya sendiri.
+        $validated['is_active'] = $user->is($request->user()) || $request->boolean('is_active', true);
 
         $changes = $this->changesBetween($user->getAttributes(), $validated, ['password']);
 
         $user->update($validated);
+
+        if (! $user->is_active) {
+            $user->tokens()->delete();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
 
         ActivityLogger::log('user.updated', 'Mengupdate user "'.$user->name.'"', $user, $changes);
 

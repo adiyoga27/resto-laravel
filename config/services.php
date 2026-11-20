@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'support' => [
+        'email' => env('SUPPORT_EMAIL'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

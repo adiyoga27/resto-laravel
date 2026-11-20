@@ -13,46 +13,6 @@ use Illuminate\Validation\Rules\Password;
 class AuthController extends Controller
 {
     /**
-     * Register new user
-     *
-     * @group Authentication
-     *
-     * @unauthenticated
-     *
-     * @bodyParam name string required User name. Example: John Doe
-     * @bodyParam email string required Email address. Example: john@example.com
-     * @bodyParam password string required Password (min 8 chars, must be confirmed). Example: password123
-     * @bodyParam password_confirmation string required Password confirmation. Example: password123
-     * @bodyParam phone string Optional phone number. Example: 08123456789
-     *
-     * @response 201 {"user":{"id":1,"name":"John Doe","email":"john@example.com","role":"customer"},"token":"1|abc123"}
-     */
-    public function register(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-            'phone' => ['nullable', 'string', 'max:20'],
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-            'phone' => $validated['phone'] ?? null,
-            'role' => 'customer',
-        ]);
-
-        $token = $user->createToken('mobile')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
-    }
-
-    /**
      * Login
      *
      * @group Authentication
